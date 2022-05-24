@@ -65,7 +65,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)//sin estado para no utilizar sesiones
 			.and()
 			.authorizeRequests()//autorizar peticiones/si hubiera algun rol habria que identificar roles de acceso .hasRole("USER")
-				.antMatchers(HttpMethod.GET, "/**", "/lote/**").hasRole("")
+//			.antMatchers(HttpMethod.POST, "/login").permitAll()
+			.antMatchers(HttpMethod.GET, "/**").permitAll()
+			.antMatchers(HttpMethod.POST, "/**").permitAll()
+			.antMatchers(HttpMethod.PUT, "/**").permitAll()
+			.antMatchers(HttpMethod.DELETE, "/**").permitAll()
 				.anyRequest().authenticated();
 
 		// Filtro de autenticación

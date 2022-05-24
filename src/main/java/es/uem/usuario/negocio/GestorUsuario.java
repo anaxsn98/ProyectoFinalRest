@@ -163,6 +163,8 @@ public class GestorUsuario implements UserDetailsService{
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		return daoUsuario.findByNombre(username);
+		Usuario user = daoUsuario.findByNombre(username);
+		System.out.println(user);
+		return user;
 	}
 }

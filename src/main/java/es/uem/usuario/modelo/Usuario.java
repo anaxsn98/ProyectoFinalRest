@@ -10,10 +10,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,33 +35,34 @@ import es.uem.usuario.dto.AltaUsuarioDto;
 public class Usuario implements UserDetails {
 
 	private static final long serialVersionUID = 6189678452627071360L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // valor generado por defecto
 	@Column(name = "id_usuario")
 	private int id;
 	@Column(unique = true)
 	private String correo;
-	@Column(unique = true,name = "nombre_usuario")
+	@Column(unique = true, name = "nombre_usuario")
 	private String nombre;
 	@Column(name = "contrasena")
 	private String pwd;
 	private String codigo_invernadero;
 	@JsonIgnore
-//	@ManyToMany(mappedBy = "usuarios", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	@OneToMany(mappedBy = "usuario", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	private List<Planta> plantas;
+
 	public Usuario() {
 		super();
 	}
 
-	public Usuario(int id, String correo, String nombre, String pwd, String codigo_invernadero) {
+	public Usuario(int id, String correo, String nombre, String pwd, String codigo_invernadero, List<Planta> plantas) {
 		super();
 		this.id = id;
 		this.correo = correo;
 		this.nombre = nombre;
 		this.pwd = pwd;
 		this.codigo_invernadero = codigo_invernadero;
+		this.plantas = plantas;
 	}
 
 	public int getId() {
@@ -128,21 +129,19 @@ public class Usuario implements UserDetails {
 	}
 
 	public void cambiosUsuairo(AltaUsuarioDto altaUser) {
-		
-		if(!this.getNombre().equals(altaUser.getNombre())) //si los nombres no coinciden
+
+		if (!this.getNombre().equals(altaUser.getNombre())) // si los nombres no coinciden
 			this.setNombre(altaUser.getNombre());
-		
-		
-		if(!this.getCorreo().equals(altaUser.getCorreo())) //si los Correos no coinciden
+
+		if (!this.getCorreo().equals(altaUser.getCorreo())) // si los Correos no coinciden
 			this.setCorreo(altaUser.getCorreo());
-		
-		if(!this.getPwd().equals(altaUser.getPwd())) //si los pwd no coinciden
+
+		if (!this.getPwd().equals(altaUser.getPwd())) // si los pwd no coinciden
 			this.setPwd(altaUser.getPwd());
-		
-		
-		if(!this.getCodigo_invernadero().equals(altaUser.getCodigo_invernadero())) //si los codigos no coinciden
+
+		if (!this.getCodigo_invernadero().equals(altaUser.getCodigo_invernadero())) // si los codigos no coinciden
 			this.setCodigo_invernadero(altaUser.getCodigo_invernadero());
-		
+
 	}
 
 	@Override
