@@ -1,5 +1,6 @@
 package es.uem.usuario.modelo;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -15,6 +16,8 @@ import javax.persistence.Table;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -29,7 +32,10 @@ import es.uem.usuario.dto.AltaUsuarioDto;
 //Anotaciones de JPA
 @Entity
 @Table(name = "usuario")
-public class Usuario {
+public class Usuario implements UserDetails {
+
+	private static final long serialVersionUID = 6189678452627071360L;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // valor generado por defecto
 	@Column(name = "id_usuario")
@@ -137,6 +143,46 @@ public class Usuario {
 		if(!this.getCodigo_invernadero().equals(altaUser.getCodigo_invernadero())) //si los codigos no coinciden
 			this.setCodigo_invernadero(altaUser.getCodigo_invernadero());
 		
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getPassword() {
+		return this.pwd;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.nombre;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
