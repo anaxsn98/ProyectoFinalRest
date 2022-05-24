@@ -3,11 +3,13 @@ package es.uem.modelo.persistencia;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.uem.modelo.entidad.Planta;
-import es.uem.modelo.entidad.Usuario;
 
 @Repository
 public interface DaoPlanta extends JpaRepository<Planta, Integer> {
@@ -20,9 +22,54 @@ public interface DaoPlanta extends JpaRepository<Planta, Integer> {
 	// ,hacemos busquedas por ese atributo. Al devolver una lista nos devolvera
 	// todas las coincidencias exactas, si pusieramos una unica Usuario, nos
 	// devolveria la primera coincidencia
-	public Usuario findById(int id);
-	public Usuario findByNombre(String nombre);
+	public Planta findById(int id);
+
+	public Planta findByNombre(String nombre);
+	public Planta findByUsuario_Id(int id);
+	public List<Planta> findAllByUsuario_id(int id);
+//	public List<Planta> findAllByUsuario(Usuario usuario);
+	/**
+	 * Busca una planta con id que le pases que sea la planta actual
+	 * 
+	 * @param id id de la planta
+	 * @return null si no se ha encontrado
+	 */
+//	@Transactional
+//	@Modifying(clearAutomatically = true)
+//	@Query(value = "SELECT * FROM personalizarplanta WHERE id_usuario= :id_user", nativeQuery = true)
+//	public List<Planta> buscarTodasPlantasDeUsuairo(@Param("id_user") int id);
+//	
+	/**
+	 * Busca todas planta con id del usuario
+	 * 
+	 * @param id id de la planta
+	 * @return null si no se ha encontrado
+	 */
 	
-	public Usuario deleteById(int id);
+	@Query(value = "SELECT * FROM personalizarplanta WHERE id_usuario= :id_user", nativeQuery = true)
+	public List<Planta> buscarPlantasDeUsuario(@Param("id_user") int id);
+	/**
+	 * Busca una planta con id que le pases que sea la planta actual
+	 * 
+	 * @param id id de la planta
+	 * @return null si no se ha encontrado
+	 */
+	
+	@Query(value = "SELECT * FROM personalizarplanta WHERE id_usuario= :id_user and fecha_fin IS NULL", nativeQuery = true)
+	public Planta buscarPlantaActual(@Param("id_user") int id);
+
+	/**
+	 * Añade el tipo de planta a la planta
+	 * 
+	 * @param id        id del tipo de planta
+	 * @param id_planta id de la planta a la que se le quiere añadir el tipo de
+	 *                  planta
+	 */
+	@Transactional
+	@Modifying(clearAutomatically = true)
+	@Query(value = "UPDATE personalizarplanta SET id_tipoplanta= :id_tipoPlanta WHERE id_planta= :id_planta", nativeQuery = true)
+	public int UpdateTipoPlanta(@Param("id_tipoPlanta") int id, @Param("id_planta") int id_planta);
+
+	public Planta deleteById(int id);
 
 }
