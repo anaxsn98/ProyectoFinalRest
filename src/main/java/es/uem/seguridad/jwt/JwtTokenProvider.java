@@ -17,10 +17,10 @@ import java.util.Date;
 import org.springframework.security.core.Authentication;
 
 @Component
-public class JwtProvider {
+public class JwtTokenProvider {
 	// constantes
 	public static final String TOKEN_HEADER = "Authorization";// Encabezado necesario para hacer autentificacion
-	public static final String TOKEN_PREFIX = "Bearer ";// prefijo que va a llegar
+	public static final String TOKEN_PREFIX = "Bearer";// prefijo que va a llegar
 	public static final String TOKEN_TYPE = "JWT"; // tipo
 
 	// clave secreta jwt.secret que se encuentra en properties
@@ -39,8 +39,10 @@ public class JwtProvider {
 		return Jwts.builder().signWith(SignatureAlgorithm.HS512, Keys.hmacShaKeyFor(jwtSecreto.getBytes()))
 				.setHeaderParam("typ", TOKEN_TYPE) // tipo de token
 				.setSubject(Integer.toString(user.getId()))
-				.setIssuedAt(new Date()).setExpiration(tokenExpirationDate)
-				.claim("nombre", user.getNombre()).compact();
+				.setIssuedAt(new Date())
+				.setExpiration(tokenExpirationDate)
+				.claim("nombre", user.getNombre())
+				.compact();
 
 	}
 

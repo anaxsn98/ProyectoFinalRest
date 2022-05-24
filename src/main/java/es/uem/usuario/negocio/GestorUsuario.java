@@ -1,4 +1,4 @@
-package es.uem.modelo.negocio;
+package es.uem.usuario.negocio;
 
 import java.util.regex.Pattern;
 
@@ -135,6 +135,16 @@ public class GestorUsuario {
 	 */
 	public Usuario findUsuarioByCorreo(String correo) {
 		return daoUsuario.findByCorreo(correo);
+	}
+	
+	/**
+	 * Buscar un usuario por id
+	 * 
+	 * @param id id del usuario que quieres buscar
+	 * @return null o usuario encontrado
+	 */
+	public Usuario findUsuarioById(int id) {
+		return daoUsuario.findById(id);
 	}
 
 	/**

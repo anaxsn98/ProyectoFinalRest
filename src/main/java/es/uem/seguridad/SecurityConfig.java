@@ -13,13 +13,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import es.uem.seguridad.jwt.JwtAuthorizationFilter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 @Configuration
 @EnableWebSecurity
 //va a permitir trabajar sobre un determinado controlador (añadiendo una anotacion) 
 //para indicar quien puede acceder si es necesario estar autenticado o tener algun rol
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private UserDetailsService userDetailsService;
@@ -27,6 +29,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private  JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	@Autowired
+	private JwtAuthorizationFilter jwtAuthorizationFilter;
 	/**
 	 * Va a exponer nuestro mecanismos de autenticación como un bean para poder usarlo en el filtro
 	 */
@@ -58,16 +62,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)//sin estado para no utilizar sesiones
 			.and()
-			.authorizeRequests()//autorizar peticiones/identificar roles de acceso
-				.antMatchers(HttpMethod.GET, "/producto/**", "/lote/**").hasRole("USER")
-				.antMatchers(HttpMethod.POST, "/producto/**", "/lote/**").hasRole("ADMIN")
-				.antMatchers(HttpMethod.PUT, "/producto/**").hasRole("ADMIN")
-				.antMatchers(HttpMethod.DELETE, "/producto/**").hasRole("ADMIN")
-				.antMatchers(HttpMethod.POST, "/pedido/**").hasAnyRole("USER","ADMIN")
+			.authorizeRequests()//autorizar peticiones/si hubiera algun rol habria que identificar roles de acceso .hasRole("USER")
+				.antMatchers(HttpMethod.GET, "/usuarios/**", "/lote/**").hasRole(null)
+				.antMatchers(HttpMethod.GET, "/plantas/**", "/lote/**").hasRole(null)
+				.antMatchers(HttpMethod.GET, "/tipoplanta/**", "/lote/**").hasRole(null)
 				.anyRequest().authenticated();
 
-		// Añadimos el filtro (lo hacemos más adelante).
-		http.addFilterBefore(null, UsernamePasswordAuthenticationFilter.class);
+		// Filtro de autenticación
+		http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 		
 		
 	}
