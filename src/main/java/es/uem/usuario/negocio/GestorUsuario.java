@@ -4,6 +4,9 @@ import java.util.regex.Pattern;
 
 import java.util.regex.Matcher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +15,7 @@ import es.uem.usuario.modelo.Usuario;
 import es.uem.usuario.persistencia.DaoUsuario;
 
 @Service
-public class GestorUsuario {
+public class GestorUsuario implements UserDetailsService{
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private DaoUsuario daoUsuario;
@@ -138,16 +141,6 @@ public class GestorUsuario {
 	}
 	
 	/**
-	 * Buscar un usuario por id
-	 * 
-	 * @param id id del usuario que quieres buscar
-	 * @return null o usuario encontrado
-	 */
-	public Usuario findUsuarioById(int id) {
-		return daoUsuario.findById(id);
-	}
-
-	/**
 	 * Eliminar usuario
 	 * 
 	 * @param id id del usuario que se quiere eliminar
@@ -157,5 +150,19 @@ public class GestorUsuario {
 		if (daoUsuario.deleteById(id) == null)
 			return false;
 		return true;
+	}
+	/**
+	 * Buscar un usuario por id
+	 * 
+	 * @param id id del usuario que quieres buscar
+	 * @return null o usuario encontrado
+	 */
+	public Usuario findUsuarioById(int id) {
+		return daoUsuario.findById(id);
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		return daoUsuario.findByNombre(username);
 	}
 }

@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import es.uem.seguridad.jwt.JwtAuthorizationFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 @Configuration
 @EnableWebSecurity
 //va a permitir trabajar sobre un determinado controlador (añadiendo una anotacion) 
@@ -31,6 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	private  JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	@Autowired
 	private JwtAuthorizationFilter jwtAuthorizationFilter;
+	
 	/**
 	 * Va a exponer nuestro mecanismos de autenticación como un bean para poder usarlo en el filtro
 	 */
@@ -45,7 +48,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
 	}
-	
 	
 	/**
 	 * Configurar el control de acceso
@@ -63,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)//sin estado para no utilizar sesiones
 			.and()
 			.authorizeRequests()//autorizar peticiones/si hubiera algun rol habria que identificar roles de acceso .hasRole("USER")
-				.antMatchers(HttpMethod.GET, "/**", "/lote/**").hasRole(null)
+				.antMatchers(HttpMethod.GET, "/**", "/lote/**").hasRole("")
 				.anyRequest().authenticated();
 
 		// Filtro de autenticación
@@ -71,4 +73,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		
 		
 	}
+	
+	
+
+
 }
