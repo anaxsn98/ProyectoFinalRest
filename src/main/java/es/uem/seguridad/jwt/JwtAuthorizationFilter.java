@@ -11,18 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import org.springframework.util.StringUtils;
-
-import es.uem.usuario.modelo.Usuario;
 import es.uem.usuario.negocio.GestorUsuario;
 import io.jsonwebtoken.ExpiredJwtException;
-import es.uem.seguridad.jwt.JwtTokenProvider;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 @Component

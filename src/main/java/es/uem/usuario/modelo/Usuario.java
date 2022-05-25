@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -129,15 +131,18 @@ public class Usuario implements UserDetails {
 	}
 
 	public void cambiosUsuairo(AltaUsuarioDto altaUser) {
-
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		
 		if (!this.getNombre().equals(altaUser.getNombre())) // si los nombres no coinciden
 			this.setNombre(altaUser.getNombre());
 
 		if (!this.getCorreo().equals(altaUser.getCorreo())) // si los Correos no coinciden
 			this.setCorreo(altaUser.getCorreo());
 
-		if (!this.getPwd().equals(altaUser.getPwd())) // si los pwd no coinciden
-			this.setPwd(altaUser.getPwd());
+		//password
+		String pwdEncode=passwordEncoder.encode(altaUser.getPwd());
+		if (!this.getPwd().equals(pwdEncode)) // si los pwd no coinciden
+			this.setPwd(pwdEncode);
 
 		if (!this.getCodigo_invernadero().equals(altaUser.getCodigo_invernadero())) // si los codigos no coinciden
 			this.setCodigo_invernadero(altaUser.getCodigo_invernadero());

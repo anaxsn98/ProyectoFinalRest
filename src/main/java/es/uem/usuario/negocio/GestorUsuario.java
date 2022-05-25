@@ -16,6 +16,7 @@ import es.uem.usuario.persistencia.DaoUsuario;
 
 @Service
 public class GestorUsuario implements UserDetailsService{
+	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private DaoUsuario daoUsuario;
@@ -66,7 +67,7 @@ public class GestorUsuario implements UserDetailsService{
 			usuario.setCodigo_invernadero(altaUsuarioDto.getCodigo_invernadero());
 			usuario.setCorreo(altaUsuarioDto.getCorreo());
 			usuario.setNombre(altaUsuarioDto.getNombre());
-			usuario.setPwd(altaUsuarioDto.getPwd());
+			usuario.setPwd(passwordEncoder.encode(altaUsuarioDto.getPwd()));
 
 			if (daoUsuario.save(usuario) != null)
 				resultado = true;

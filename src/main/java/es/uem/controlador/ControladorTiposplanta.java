@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,7 @@ public class ControladorTiposplanta {
 	 * 
 	 * @return lista de tipos de plantas
 	 */
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/tipoplanta", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Tiposplanta>> getTipoPlantaById() {
 
@@ -42,7 +44,7 @@ public class ControladorTiposplanta {
 			return new ResponseEntity<List<Tiposplanta>>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
 		}
 	}
-
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/tipoplanta/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Tiposplanta> getTipoPlantaById(@PathVariable("id") int id) {
 
@@ -55,7 +57,7 @@ public class ControladorTiposplanta {
 			return new ResponseEntity<Tiposplanta>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
 		}
 	}
-
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/tipoplanta/{nombre}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Tiposplanta> getTipoPlantaByNombre(@PathVariable("nombre") String nombre) {
 
@@ -68,13 +70,13 @@ public class ControladorTiposplanta {
 			return new ResponseEntity<Tiposplanta>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
 		}
 	}
-
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping(path = "tipoplanta", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Tiposplanta> altaTipoPlanta(@RequestBody Tiposplanta p) {
 		daoTiposplanta.save(p);
 		return new ResponseEntity<Tiposplanta>(p, HttpStatus.CREATED);// 201 CREATED
 	}
-
+	@PreAuthorize("isAuthenticated()")
 	@DeleteMapping(path = "tipoplanta/{nombre}")
 	public ResponseEntity<Tiposplanta> borrarTipoPlanta(@PathVariable("nombre") String nombre) {
 
