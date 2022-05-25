@@ -15,11 +15,15 @@ import org.springframework.util.StringUtils;
 
 import es.uem.usuario.modelo.Usuario;
 import es.uem.usuario.negocio.GestorUsuario;
+import io.jsonwebtoken.ExpiredJwtException;
+import es.uem.seguridad.jwt.JwtTokenProvider;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -31,47 +35,47 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		try {
-			String token = getJwtFromRequest(request);
+		final String requestTokenHeader = request.getHeader("Authorization");
 
-			//comprobamos que el estring no esté vacío y lo validamos
-			if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-				int userId = tokenProvider.getUserIdFromJWT(token);
-
-				Usuario user =  gestorUsuario.findUsuarioById(userId);
-				
-				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user,
-						null, user.getAuthorities());
-				
-				//No influye son detalles solo es por si hubiera un sesion id, la dirección remota...
-				authentication.setDetails(new WebAuthenticationDetails(request));
-
-				//contexto de seguridad donde guardamos la autenticación con el usuario
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-
+		String username = null;
+		String jwtToken = null;
+		// JWT Token is in the form "Bearer token". Remove Bearer word and get
+		// only the Token
+		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+			jwtToken = requestTokenHeader.substring(7);
+			try {
+				username = tokenProvider.getUsernameFromToken(jwtToken);
+			} catch (IllegalArgumentException e) {
+				System.out.println("Unable to get JWT Token");
+			} catch (ExpiredJwtException e) {
+				System.out.println("JWT Token has expired");
 			}
-		} catch (Exception e) {
-			System.out.println("No se ha podido establecer la autenticación de usuario en el contexto de seguridad");
+		} else {
+			logger.warn("JWT Token does not begin with Bearer String");
 		}
 
+		// Once we get the token validate it.
+		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+			UserDetails userDetails = this.gestorUsuario.loadUserByUsername(username);
+
+			// if token is valid configure Spring Security to manually set
+			// authentication
+			if (tokenProvider.validateToken(jwtToken,userDetails)) {
+
+				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+						userDetails, null, userDetails.getAuthorities());
+				usernamePasswordAuthenticationToken
+						.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+				// After setting the Authentication in the context, we specify
+				// that the current user is authenticated. So it passes the
+				// Spring Security Configurations successfully.
+				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+			}
+		}
 		filterChain.doFilter(request, response);
 	}
 
-	/**
-	 * Método que recibe la petición y devuelve el token
-	 * 
-	 * @param request request de la que se va a sacar el header
-	 * @return devuelve del header de la request la parte correspondiente al token quitando el prefijo,
-	 * 			en caso contrario se devuelve null
-	 */
-	private String getJwtFromRequest(HttpServletRequest request) {
-		String bearerToken = request.getHeader(JwtTokenProvider.TOKEN_HEADER);
-		
-		//Si el bearerToken tiene texto y empieza por el prefijo Bearer
-		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(JwtTokenProvider.TOKEN_PREFIX)) {
-			return bearerToken.substring(JwtTokenProvider.TOKEN_PREFIX.length(), bearerToken.length());
-		}
-		return null;
-	}
+	
 
 }

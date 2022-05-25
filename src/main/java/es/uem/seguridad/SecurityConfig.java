@@ -55,23 +55,39 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		
-		http
-			.csrf()
-				.disable()
-			.exceptionHandling()
-				.authenticationEntryPoint(jwtAuthenticationEntryPoint) // Lo modificamos más adelante
-			.and()
-			.sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)//sin estado para no utilizar sesiones
-			.and()
-			.authorizeRequests()//autorizar peticiones/si hubiera algun rol habria que identificar roles de acceso .hasRole("USER")
-//			.antMatchers(HttpMethod.POST, "/login").permitAll()
-			.antMatchers(HttpMethod.GET, "/**").permitAll()
-			.antMatchers(HttpMethod.POST, "/**").permitAll()
-			.antMatchers(HttpMethod.PUT, "/**").permitAll()
-			.antMatchers(HttpMethod.DELETE, "/**").permitAll()
-				.anyRequest().authenticated();
+//		http
+//			.csrf()
+//				.disable()
+//			.exceptionHandling()
+//				.authenticationEntryPoint(jwtAuthenticationEntryPoint) // Lo modificamos más adelante
+//			.and()
+//			.sessionManagement()
+//				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)//sin estado para no utilizar sesiones
+//			.and()
+//			.authorizeRequests()//autorizar peticiones/si hubiera algun rol habria que identificar roles de acceso .hasRole("USER")
+////			.antMatchers(HttpMethod.POST, "/login").permitAll()
+//			.antMatchers(HttpMethod.GET, "/**").permitAll()
+//			.antMatchers(HttpMethod.POST, "/**").permitAll()
+//			.antMatchers(HttpMethod.PUT, "/**").permitAll()
+//			.antMatchers(HttpMethod.DELETE, "/**").permitAll()
+//				.anyRequest().authenticated();
 
+		http.csrf().disable()
+		// dont authenticate this particular request
+		.authorizeRequests()//autorizar peticiones/si hubiera algun rol habria que identificar roles de acceso .hasRole("USER")
+		.antMatchers("/authenticate", "/register").permitAll()
+		.antMatchers(HttpMethod.GET, "/**").permitAll()
+		.antMatchers(HttpMethod.POST, "/**").permitAll()
+		.antMatchers(HttpMethod.PUT, "/**").permitAll()
+		.antMatchers(HttpMethod.DELETE, "/**").permitAll().
+		// all other requests need to be authenticated
+		anyRequest().authenticated().and().
+		// make sure we use stateless session; session won't be used to
+		// store user's state.
+		exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+		.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+		
 		// Filtro de autenticación
 		http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 		
