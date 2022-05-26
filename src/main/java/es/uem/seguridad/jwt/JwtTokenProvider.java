@@ -57,8 +57,9 @@ public class JwtTokenProvider {
 	}
 
 	//generate token for user
-	public String generateToken(UserDetails userDetails) {
+	public String generateToken(UserDetails userDetails, int id) {
 		Map<String, Object> claims = new HashMap<>();
+		claims.put("id", id);
 		return doGenerateToken(claims, userDetails.getUsername());
 	}
 
@@ -69,7 +70,9 @@ public class JwtTokenProvider {
 	//   compaction of the JWT to a URL-safe string 
 	private String doGenerateToken(Map<String, Object> claims, String subject) {
 
-		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+		return Jwts.builder().setClaims(claims)
+				.setSubject(subject)
+				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
 				.signWith(SignatureAlgorithm.HS512, secret).compact();
 	}

@@ -39,7 +39,7 @@ public class GestorUsuario implements UserDetailsService{
 		Matcher matcher;
 		Pattern pattern = Pattern.compile(PATRON_VALIDACION_EMAIL);
 
-		if (nombre.length() < 4 || !pattern.matcher(correo).matches() || correo.length() < 4 || codigo.length() < 4)
+		if (nombre.length() < 6 || !pattern.matcher(correo).matches() || correo.length() < 6 || codigo.length() < 6)
 			return false;
 
 		if (!pwd1.equals(pwd2))

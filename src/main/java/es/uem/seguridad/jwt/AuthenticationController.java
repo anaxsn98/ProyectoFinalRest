@@ -48,8 +48,10 @@ public class AuthenticationController {
 
 		final UserDetails userDetails = gestorUsuario
 				.loadUserByUsername(authenticationRequest.getUsername());
+		Usuario user = gestorUsuario
+				.findUsuarioByNombre(authenticationRequest.getUsername());
 
-		final String token = tokenProvider.generateToken(userDetails);
+		final String token = tokenProvider.generateToken(userDetails,user.getId());
 
 		return new JwtResponse(token);
 	}
