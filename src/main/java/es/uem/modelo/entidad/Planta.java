@@ -45,7 +45,7 @@ public class Planta {
 	private Integer id;
 	@Column(name = "nombre_planta")
 	private String nombre;
-	@JsonIgnore
+	
 	@ManyToOne
 	@JoinColumn(name = "id_tipoplanta", referencedColumnName = "id_tipoplanta")
 	private Tiposplanta tiposplanta;
@@ -72,7 +72,7 @@ public class Planta {
 	@Column(name = "cantidad_amor")
 	private String amor;
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne()
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
 	private Usuario usuario;
 
@@ -96,32 +96,16 @@ public class Planta {
 	}
 
 
-	/**
-	 * Añadir un usuario a la lista
-	 * 
-	 * @param usuario que se quiere añadir a la lista de uauaarios
-	 */
-//	public void addUsuario(Usuario usuario) {
-//		this.usuarios.add(usuario);
-//	}
-//
-//	public List<Usuario> getUsuarios() {
-//		return usuarios;
-//	}
-//
-//	public void setUsuarios(List<Usuario> usuarios) {
-//		this.usuarios = usuarios;
-//	}
-
-	
 	@Override
 	public String toString() {
-		return "Planta [id=" + id + ", nombre=" + nombre + ", tipo=" + tiposplanta + ", fechaIni=" + fechaIni + ", fechaFin="
-				+ fechaFin + ", regar=" + regar + ", intervaloTiempoRiego=" + intervaloTiempoRiego + ", ml=" + ml
-				+ ", luz=" + luz + ", intervaloTiempoLuz=" + intervaloTiempoLuz + ", minLuz=" + minLuz + ", ventilador="
-				+ ventilador + ", intervaloTiempoVentilador=" + intervaloTiempoVentilador + ", minVentilador="
-				+ minVentilador + ", amor=" + amor + "]";
+		return "Planta [id=" + id + ", nombre=" + nombre + ", tiposplanta=" + tiposplanta + ", fechaIni=" + fechaIni
+				+ ", fechaFin=" + fechaFin + ", regar=" + regar + ", intervaloTiempoRiego=" + intervaloTiempoRiego
+				+ ", ml=" + ml + ", luz=" + luz + ", intervaloTiempoLuz=" + intervaloTiempoLuz + ", minLuz=" + minLuz
+				+ ", ventilador=" + ventilador + ", intervaloTiempoVentilador=" + intervaloTiempoVentilador
+				+ ", minVentilador=" + minVentilador + ", amor=" + amor + ", usuario=" + usuario + ", eventos="
+				+ eventos + "]";
 	}
+
 
 	public Integer getId() {
 		return id;

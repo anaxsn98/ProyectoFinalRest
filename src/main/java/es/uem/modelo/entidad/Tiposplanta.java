@@ -16,6 +16,8 @@ import javax.persistence.Table;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 //Anotaciones Spring
 @Component
 @Scope("prototype")
@@ -28,7 +30,7 @@ public class Tiposplanta {
 	@Column(name = "nombre_tipo_planta")
 	private String nombre;
 	private String img_url;
-	
+	@JsonIgnore
 	@OneToMany(mappedBy = "tiposplanta")
 	private List<Planta> planta;
 
