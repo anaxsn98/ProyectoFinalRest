@@ -17,13 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.uem.modelo.entidad.Evento;
 import es.uem.modelo.entidad.Planta;
+import es.uem.modelo.entidad.Tiposplanta;
 import es.uem.modelo.persistencia.DaoPlanta;
+import es.uem.modelo.persistencia.DaoTiposplanta;
 import es.uem.usuario.modelo.Usuario;
 
 @RestController
 public class ControladorPlanta {
 	@Autowired
 	private DaoPlanta daoPlanta;
+	@Autowired
+	private DaoTiposplanta daoTiposplanta;
 
 	/**
 	 * Devuelve los eventos de la planta
@@ -55,9 +59,14 @@ public class ControladorPlanta {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "plantas/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Planta> buscarPlantaActual(@PathVariable("id") int id) {
-		System.out.println("Buscando usuario con nombre: " + id);
-		// Búsqueda por nombre
-		Planta p = daoPlanta.buscarPlantaActual(id);
+		int id_tipoplanta;
+		Tiposplanta t;
+		Planta p;
+		
+		p= daoPlanta.buscarPlantaActual(id);
+		id_tipoplanta = daoPlanta.buscarIdTipoPlantaDePlanta(p.getId());
+		t = daoTiposplanta.findById(id_tipoplanta);
+		p.setImg(t.getImg_url());
 
 		if (p != null) {
 			return new ResponseEntity<Planta>(p, HttpStatus.OK);// 200 OK
@@ -73,12 +82,16 @@ public class ControladorPlanta {
 	 * @return lista de las plantas del usuario
 	 */
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping(path = "usuario/{id}/plantas", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "usuarios/{id}/plantas", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Planta>> buscarTodasLasPlantasDelUsuario(@PathVariable("id") int id) {
-		System.out.println("Buscando usuario con nombre: " + id);
-		// Búsqueda por nombre
-//		List<Planta> p = DaoPlanta.buscarTodasPlantasDeUsuairo(id);
+		int id_tipoplanta;
+			
 		List<Planta> p = daoPlanta.findAllByUsuario_id(id);
+		for (Planta planta : p) {
+			id_tipoplanta = daoPlanta.buscarIdTipoPlantaDePlanta(planta.getId());
+			Tiposplanta t = daoTiposplanta.findById(id_tipoplanta);
+			planta.setImg(t.getImg_url());
+		}
 		if (p != null) {
 			return new ResponseEntity<List<Planta>>(p, HttpStatus.OK);// 200 OK
 		} else {
@@ -100,6 +113,7 @@ public class ControladorPlanta {
 		return new ResponseEntity<Planta>(p, HttpStatus.CREATED);// 201 CREATED
 	}
 
+	
 	/**
 	 * Modificar los datos de la planta
 	 * 

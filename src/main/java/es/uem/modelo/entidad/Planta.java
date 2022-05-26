@@ -45,7 +45,6 @@ public class Planta {
 	private Integer id;
 	@Column(name = "nombre_planta")
 	private String nombre;
-	/** Relación1-N */
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "id_tipoplanta", referencedColumnName = "id_tipoplanta")
@@ -73,19 +72,25 @@ public class Planta {
 	@Column(name = "cantidad_amor")
 	private String amor;
 
-//	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-//	@JoinTable(name = "plantausuario", joinColumns = {
-//			@JoinColumn(name = "id_planta", referencedColumnName = "id_planta") }, inverseJoinColumns = {
-//					@JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario") })
-//					
-//	private List<Usuario> usuarios;
 	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
 	private Usuario usuario;
 
 	@Transient
 	private List<Evento> eventos;
+	@Transient
+	private String img;
 	
+	public String getImg() {
+		return img;
+	}
+
+
+	public void setImg(String img) {
+		this.img = img;
+	}
+
+
 	public Planta() {
 		super();
 	}

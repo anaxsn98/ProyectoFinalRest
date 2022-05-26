@@ -20,8 +20,6 @@ public interface DaoTiposplanta extends JpaRepository<Tiposplanta, Integer> {
 	 * @param id id del tipo de planta que se está buscando
 	 * @return null si no se ha encontrado o el tipo de planta 
 	 */
-	@Transactional
-	@Modifying(clearAutomatically = true)
 	@Query(value = "SELECT * FROM tiposplanta	 WHERE id_tipoplanta= :id", nativeQuery = true)
 	public Tiposplanta findById(@Param("id") int id);
 	

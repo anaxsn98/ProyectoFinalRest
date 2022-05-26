@@ -27,18 +27,7 @@ public interface DaoPlanta extends JpaRepository<Planta, Integer> {
 	public Planta findByNombre(String nombre);
 	public Planta findByUsuario_Id(int id);
 	public List<Planta> findAllByUsuario_id(int id);
-//	public List<Planta> findAllByUsuario(Usuario usuario);
-	/**
-	 * Busca una planta con id que le pases que sea la planta actual
-	 * 
-	 * @param id id de la planta
-	 * @return null si no se ha encontrado
-	 */
-//	@Transactional
-//	@Modifying(clearAutomatically = true)
-//	@Query(value = "SELECT * FROM personalizarplanta WHERE id_usuario= :id_user", nativeQuery = true)
-//	public List<Planta> buscarTodasPlantasDeUsuairo(@Param("id_user") int id);
-//	
+
 	/**
 	 * Busca todas planta con id del usuario
 	 * 
@@ -69,6 +58,16 @@ public interface DaoPlanta extends JpaRepository<Planta, Integer> {
 	@Modifying(clearAutomatically = true)
 	@Query(value = "UPDATE personalizarplanta SET id_tipoplanta= :id_tipoPlanta WHERE id_planta= :id_planta", nativeQuery = true)
 	public int UpdateTipoPlanta(@Param("id_tipoPlanta") int id, @Param("id_planta") int id_planta);
+	
+
+	/**
+	 * Busca id del tipo planta con id de la planta
+	 * 
+	 * @param id id de la planta
+	 * @return 0 si no se ha encontrado
+	 */
+	@Query(value = "SELECT id_tipoplanta FROM personalizarplanta WHERE id_planta = :id", nativeQuery = true)
+	public int buscarIdTipoPlantaDePlanta(@Param("id") int id);
 
 	public Planta deleteById(int id);
 
