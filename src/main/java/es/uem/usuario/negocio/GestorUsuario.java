@@ -58,7 +58,6 @@ public class GestorUsuario implements UserDetailsService{
 	 *         contrario
 	 */
 	public boolean altaUsuairo(AltaUsuarioDto altaUsuarioDto) {
-		boolean resultado = false;
 		Usuario usuario;
 
 		if (comprobarDatos(altaUsuarioDto.getNombre(), altaUsuarioDto.getCorreo(),
@@ -69,8 +68,8 @@ public class GestorUsuario implements UserDetailsService{
 			usuario.setNombre(altaUsuarioDto.getNombre());
 			usuario.setPwd(passwordEncoder.encode(altaUsuarioDto.getPwd()));
 
-			if (daoUsuario.save(usuario) != null)
-				resultado = true;
+			daoUsuario.save(usuario);
+			return true;
 		}
 
 		return false;
@@ -165,6 +164,10 @@ public class GestorUsuario implements UserDetailsService{
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Usuario user = daoUsuario.findByNombre(username);
+		//Búsqueda por correo
+		if(user == null)
+			user = daoUsuario.findByCorreo(username);
+		
 		System.out.println(user);
 		return user;
 	}

@@ -132,15 +132,15 @@ public class Usuario implements UserDetails {
 
 	public void cambiosUsuairo(AltaUsuarioDto altaUser) {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		
+
 		if (!this.getNombre().equals(altaUser.getNombre())) // si los nombres no coinciden
 			this.setNombre(altaUser.getNombre());
 
 		if (!this.getCorreo().equals(altaUser.getCorreo())) // si los Correos no coinciden
 			this.setCorreo(altaUser.getCorreo());
 
-		//password
-		String pwdEncode=passwordEncoder.encode(altaUser.getPwd());
+		// password
+		String pwdEncode = passwordEncoder.encode(altaUser.getPwd());
 		if (!this.getPwd().equals(pwdEncode)) // si los pwd no coinciden
 			this.setPwd(pwdEncode);
 
@@ -171,10 +171,15 @@ public class Usuario implements UserDetails {
 		return false;
 	}
 
+	/**
+	 * The method is isAccountNonLocked, emphasis on non. You need to return true
+	 * from this method in order to have an 'unlocked' account. Same thing with the
+	 * method that pertains to 'expired', etc. In this case true means allow it,
+	 * false means reject it.
+	 */
 	@Override
 	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override

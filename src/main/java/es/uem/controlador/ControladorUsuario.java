@@ -7,6 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +21,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.uem.seguridad.jwt.JwtTokenProvider;
+import es.uem.seguridad.jwt.modelo.JwtResponse;
 import es.uem.usuario.dto.AltaUsuarioDto;
+import es.uem.usuario.dto.UserDtoConverter;
 import es.uem.usuario.modelo.Usuario;
 import es.uem.usuario.negocio.GestorUsuario;
 import es.uem.usuario.persistencia.DaoUsuario;
@@ -24,8 +32,13 @@ import es.uem.usuario.persistencia.DaoUsuario;
 @RestController
 public class ControladorUsuario {
 	@Autowired
-	private GestorUsuario daoUsuario;
-
+	private GestorUsuario gestorUsuario;
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	@Autowired
+	private JwtTokenProvider tokenProvider;
+	@Autowired
+	private UserDtoConverter converter;
 	/**
 	 * Buscar persona por nombre o correo en la base de datos
 	 * 
@@ -37,10 +50,10 @@ public class ControladorUsuario {
 	public ResponseEntity<Usuario> getPersonaByNombre(@PathVariable("nombre") String nombre) {
 		System.out.println("Buscando usuario con nombre: " + nombre);
 		//Búsqueda por nombre
-		Usuario u = daoUsuario.findUsuarioByNombre(nombre);
+		Usuario u = gestorUsuario.findUsuarioByNombre(nombre);
 		//Búsqueda por correo
 		if(u == null)
-			 u = daoUsuario.findUsuarioByCorreo(nombre);
+			 u = gestorUsuario.findUsuarioByCorreo(nombre);
 		
 		if (u != null) {
 			return new ResponseEntity<Usuario>(u, HttpStatus.OK);// 200 OK
@@ -61,10 +74,10 @@ public class ControladorUsuario {
 	public ResponseEntity<Usuario> login(@RequestParam("nombre") String nombre,@RequestParam("pwd") String pwd) {
 		System.out.println("Buscando usuario con nombre: " + nombre);
 		//Búsqueda por nombre
-		Usuario u = daoUsuario.findByNombreAndPwd(nombre,pwd);
+		Usuario u = gestorUsuario.findByNombreAndPwd(nombre,pwd);
 		//Búsqueda por correo
 		if(u == null)
-			 u = daoUsuario.findByCorreoAndPwd(nombre,pwd);
+			 u = gestorUsuario.findByCorreoAndPwd(nombre,pwd);
 		
 		System.out.println(u);
 		if (u != null) {
@@ -80,11 +93,36 @@ public class ControladorUsuario {
 	 * @param u usuario que queremos dar de alta
 	 * @return codigo de respuesta 201 CREATED
 	 */
-	@PostMapping(path = "usuarios", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Usuario> altaPersona(@RequestBody AltaUsuarioDto u) {
-		daoUsuario.altaUsuairo(u);
-		Usuario user = daoUsuario.findUsuarioByNombre(u.getNombre());;
-		return new ResponseEntity<Usuario>(user, HttpStatus.CREATED);// 201 CREATED
+//	@PostMapping(path = "/usuarios", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+//	public JwtResponse altaPersona(@RequestBody AltaUsuarioDto u) {
+//		if(gestorUsuario.altaUsuairo(u)) {
+//			try {
+//				authenticate(u.getNombre(), u.getPwd());
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//
+//			final UserDetails userDetails = gestorUsuario
+//					.loadUserByUsername(u.getNombre());
+//			Usuario user = gestorUsuario
+//					.findUsuarioByNombre(u.getPwd());
+//
+//			final String token = tokenProvider.generateToken(userDetails,user.getId());
+//
+//			return new JwtResponse(token,Integer.toString(user.getId()),user.getNombre());
+//		}
+//		return null;
+//	}
+	
+	private void authenticate(String username, String password) throws Exception {
+		try {
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		} catch (DisabledException e) {
+			throw new Exception("USER_DISABLED", e);
+		} catch (BadCredentialsException e) {
+			throw new Exception("INVALID_CREDENTIALS", e);
+		}
 	}
 
 	/**
@@ -101,9 +139,9 @@ public class ControladorUsuario {
 		System.out.println("ID a modificar: " + id);
 		System.out.println("Datos a modificar: " + u);
 		
-		daoUsuario.guardarCambiosUsuairo(u);
+		gestorUsuario.guardarCambiosUsuairo(u);
 		//buscamos el usuario en la bbbdd para comprobar que se ha actualizado la pwd
-		Usuario user = daoUsuario.findUsuarioById(id);
+		Usuario user = gestorUsuario.findUsuarioById(id);
 		if(u.getPwd().equals(user.getPwd())) {
 			return new ResponseEntity<Usuario>(HttpStatus.OK);//200 OK
 		}else {
@@ -120,8 +158,8 @@ public class ControladorUsuario {
 	@DeleteMapping(path = "usuarios/{id}")
 	public ResponseEntity<Usuario> borrarPersona(@PathVariable("id") int id) {
 		System.out.println("ID a borrar: " + id);
-		daoUsuario.bajaUsurio(id);
-		Usuario u = daoUsuario.findUsuarioById(id);
+		gestorUsuario.bajaUsurio(id);
+		Usuario u = gestorUsuario.findUsuarioById(id);
 		if (u == null) {
 			return new ResponseEntity<Usuario>( HttpStatus.OK);// 200 OK
 		} else {
