@@ -33,7 +33,7 @@ public class ControladorTiposplanta {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/tipoplanta", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Tiposplanta>> getTipoPlantaById() {
+	public ResponseEntity<List<Tiposplanta>> getAllTipoPlanta() {
 
 		// Búsqueda por id
 		List<Tiposplanta> t = daoTiposplanta.findAll();

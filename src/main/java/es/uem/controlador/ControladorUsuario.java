@@ -87,43 +87,6 @@ public class ControladorUsuario {
 		}
 	}
 
-	/**
-	 * Dar de alta un usuario en la base de datos
-	 * 
-	 * @param u usuario que queremos dar de alta
-	 * @return codigo de respuesta 201 CREATED
-	 */
-//	@PostMapping(path = "/usuarios", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-//	public JwtResponse altaPersona(@RequestBody AltaUsuarioDto u) {
-//		if(gestorUsuario.altaUsuairo(u)) {
-//			try {
-//				authenticate(u.getNombre(), u.getPwd());
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//
-//			final UserDetails userDetails = gestorUsuario
-//					.loadUserByUsername(u.getNombre());
-//			Usuario user = gestorUsuario
-//					.findUsuarioByNombre(u.getPwd());
-//
-//			final String token = tokenProvider.generateToken(userDetails,user.getId());
-//
-//			return new JwtResponse(token,Integer.toString(user.getId()),user.getNombre());
-//		}
-//		return null;
-//	}
-	
-	private void authenticate(String username, String password) throws Exception {
-		try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-		} catch (DisabledException e) {
-			throw new Exception("USER_DISABLED", e);
-		} catch (BadCredentialsException e) {
-			throw new Exception("INVALID_CREDENTIALS", e);
-		}
-	}
 
 	/**
 	 * Modificar los datos del usuario
