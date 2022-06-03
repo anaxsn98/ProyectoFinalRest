@@ -63,7 +63,7 @@ public class Evento {
 				meses.add(s);
 			}
 
-		}
+		}//3 nada
 
 	}
 

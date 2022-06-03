@@ -68,6 +68,15 @@ public interface DaoPlanta extends JpaRepository<Planta, Integer> {
 	 */
 	@Query(value = "SELECT id_tipoplanta FROM personalizarplanta WHERE id_planta = :id", nativeQuery = true)
 	public int buscarIdTipoPlantaDePlanta(@Param("id") int id);
+	
+	/**
+	 * Borrar todas las plantas del usuairo
+	 * 
+	 * @param id id de la planta
+	 * @return 0 si no se ha encontrado
+	 */
+	@Query(value = "DELETE FROM personalizarplanta WHERE id_usuario = :id", nativeQuery = true)
+	public int deleteByIdUser(@Param("id") int id);
 
 	public Planta deleteById(int id);
 

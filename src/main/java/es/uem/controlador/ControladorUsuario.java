@@ -12,6 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.uem.modelo.negocio.GestorPlanta;
 import es.uem.seguridad.jwt.JwtTokenProvider;
 import es.uem.seguridad.jwt.modelo.JwtResponse;
 import es.uem.usuario.dto.AltaUsuarioDto;
@@ -34,11 +36,14 @@ public class ControladorUsuario {
 	@Autowired
 	private GestorUsuario gestorUsuario;
 	@Autowired
+	private GestorPlanta gestorPlanta;
+	@Autowired
 	private AuthenticationManager authenticationManager;
 	@Autowired
 	private JwtTokenProvider tokenProvider;
 	@Autowired
 	private UserDtoConverter converter;
+	
 	/**
 	 * Buscar persona por nombre o correo en la base de datos
 	 * 
@@ -46,14 +51,10 @@ public class ControladorUsuario {
 	 * @return el codigo 200 "OK" si existe o 404 NOT FOUND si no existe
 	 */
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping(path = "/usuarios/{nombre}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Usuario> getPersonaByNombre(@PathVariable("nombre") String nombre) {
-		System.out.println("Buscando usuario con nombre: " + nombre);
-		//Búsqueda por nombre
-		Usuario u = gestorUsuario.findUsuarioByNombre(nombre);
-		//Búsqueda por correo
-		if(u == null)
-			 u = gestorUsuario.findUsuarioByCorreo(nombre);
+	@GetMapping(path = "/usuarios/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Usuario> getPersonaById(@PathVariable("id") int id) {
+		
+		Usuario u = gestorUsuario.findUsuarioById(id);
 		
 		if (u != null) {
 			return new ResponseEntity<Usuario>(u, HttpStatus.OK);// 200 OK
@@ -102,10 +103,7 @@ public class ControladorUsuario {
 		System.out.println("ID a modificar: " + id);
 		System.out.println("Datos a modificar: " + u);
 		
-		gestorUsuario.guardarCambiosUsuairo(u);
-		//buscamos el usuario en la bbbdd para comprobar que se ha actualizado la pwd
-		Usuario user = gestorUsuario.findUsuarioById(id);
-		if(u.getPwd().equals(user.getPwd())) {
+		if(gestorUsuario.guardarCambiosUsuairo(u,id)) {
 			return new ResponseEntity<Usuario>(HttpStatus.OK);//200 OK
 		}else {
 			return new ResponseEntity<Usuario>(HttpStatus.NOT_FOUND);//404 NOT FOUND
@@ -120,9 +118,13 @@ public class ControladorUsuario {
 	@PreAuthorize("isAuthenticated()")
 	@DeleteMapping(path = "usuarios/{id}")
 	public ResponseEntity<Usuario> borrarPersona(@PathVariable("id") int id) {
-		System.out.println("ID a borrar: " + id);
-		gestorUsuario.bajaUsurio(id);
 		Usuario u = gestorUsuario.findUsuarioById(id);
+		if(u != null)//borrar todas las plantas del usuario
+			gestorPlanta.deleteByIdUser(id);
+
+		
+		gestorUsuario.bajaUsurio(id);
+		u = gestorUsuario.findUsuarioById(id);
 		if (u == null) {
 			return new ResponseEntity<Usuario>( HttpStatus.OK);// 200 OK
 		} else {

@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @RestController
@@ -37,6 +39,8 @@ public class AuthenticationController {
 	private UserDtoConverter converter;
 	@Autowired
 	private GestorUsuario gestorUsuario;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@PostMapping(path ="/authenticate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public JwtResponse login(@RequestBody JwtRequest authenticationRequest) {
@@ -50,8 +54,20 @@ public class AuthenticationController {
 
 		final UserDetails userDetails = gestorUsuario
 				.loadUserByUsername(authenticationRequest.getUsername());
+		
 		Usuario user = gestorUsuario
 				.findUsuarioByNombre(authenticationRequest.getUsername());
+		
+		if(user == null)
+			user = gestorUsuario
+			.findUsuarioByCorreo(authenticationRequest.getUsername());
+	
+		if (user == null)
+			return null;
+					
+		if(!passwordEncoder.matches(authenticationRequest.getPassword(),user.getPwd())) {
+			return null;
+		}
 
 		final String token = tokenProvider.generateToken(userDetails,user.getId());
 

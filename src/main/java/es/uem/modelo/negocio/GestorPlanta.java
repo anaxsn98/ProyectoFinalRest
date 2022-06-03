@@ -129,6 +129,10 @@ public class GestorPlanta {
 			p.setFechaIni(p.getFechaIni());
 			p.setUsuario(p.getUsuario());
 			System.out.println(planta);
+		}else {
+			p.setRegar(0);
+			p.setLuz(0);
+			p.setVentilador(0);
 		}
 
 		p.setUsuario(daoUsuario.findById(id_user));
@@ -144,6 +148,10 @@ public class GestorPlanta {
 		daoPlanta.save(p);
 	}
 
+	public int deleteByIdUser(int id) {
+		return daoPlanta.deleteByIdUser(id);
+	}
+	
 	public Planta deleteById(int id) {
 		daoPlanta.deleteById(id);
 		return daoPlanta.findById(id);		

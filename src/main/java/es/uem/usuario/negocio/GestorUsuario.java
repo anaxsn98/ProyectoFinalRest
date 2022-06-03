@@ -81,10 +81,10 @@ public class GestorUsuario implements UserDetailsService{
 	 * @param altaUsuarioDto usuario con los datos nuevos
 	 * @return true si se han guardado los cambios, false en caso contrario
 	 */
-	public boolean guardarCambiosUsuairo(AltaUsuarioDto altaUsuarioDto) {
+	public boolean guardarCambiosUsuairo(AltaUsuarioDto altaUsuarioDto, int id) {
 		Usuario user;
-		user = daoUsuario.findByCorreo(altaUsuarioDto.getCorreo());
-
+		user = daoUsuario.findById(id);
+		
 		if (user == null)
 			return false;
 
@@ -92,8 +92,9 @@ public class GestorUsuario implements UserDetailsService{
 				altaUsuarioDto.getCodigo_invernadero(), altaUsuarioDto.getPwd(), altaUsuarioDto.getPwd2())) {
 
 			user.cambiosUsuairo(altaUsuarioDto);
-			if (daoUsuario.save(user) != null)
-				return true;
+			System.out.println(user);
+			daoUsuario.save(user);
+			return true;
 		}
 		return false;
 	}

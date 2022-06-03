@@ -96,7 +96,7 @@ public class ControladorPlanta {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping(path = "usuarios/{id}/plantas", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Planta> altaPersona(@PathVariable("id") int id_user, @RequestBody Planta p) {
+	public ResponseEntity<Planta> altaPlanta(@PathVariable("id") int id_user, @RequestBody Planta p) {
 
 		Planta planta = gestorPlanta.guardar(p, id_user);
 
