@@ -1,7 +1,7 @@
 package es.uem.usuario.negocio;
 
 import java.util.regex.Pattern;
-
+import java.util.List;
 import java.util.regex.Matcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import es.uem.modelo.entidad.Planta;
+import es.uem.modelo.negocio.GestorPlanta;
 import es.uem.usuario.dto.AltaUsuarioDto;
 import es.uem.usuario.modelo.Usuario;
 import es.uem.usuario.persistencia.DaoUsuario;
@@ -21,7 +23,8 @@ public class GestorUsuario implements UserDetailsService{
 	@Autowired
 	private DaoUsuario daoUsuario;
 	private static final String PATRON_VALIDACION_EMAIL = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-
+	@Autowired
+	private GestorPlanta gestorPlanta;
 
 	/**
 	 * Método que comprueba que las reglas de negocio. Comprueba que el correo sea
@@ -148,8 +151,13 @@ public class GestorUsuario implements UserDetailsService{
 	 * @return true si se ha eliminado, false en caso contrario
 	 */
 	public boolean bajaUsurio(int id) {
-		if (daoUsuario.deleteById(id) == null)
-			return false;
+		//borrar plantas del usuario
+		List<Planta> plantas =  gestorPlanta.findAllByUsuario_id(id);
+		for (Planta planta : plantas) {
+			gestorPlanta.deleteById(planta.getId());
+		}
+		
+		daoUsuario.deleteById(id);
 		return true;
 	}
 	/**

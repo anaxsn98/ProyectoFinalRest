@@ -36,8 +36,6 @@ public class ControladorUsuario {
 	@Autowired
 	private GestorUsuario gestorUsuario;
 	@Autowired
-	private GestorPlanta gestorPlanta;
-	@Autowired
 	private AuthenticationManager authenticationManager;
 	@Autowired
 	private JwtTokenProvider tokenProvider;
@@ -118,14 +116,8 @@ public class ControladorUsuario {
 	@PreAuthorize("isAuthenticated()")
 	@DeleteMapping(path = "usuarios/{id}")
 	public ResponseEntity<Usuario> borrarPersona(@PathVariable("id") int id) {
-		Usuario u = gestorUsuario.findUsuarioById(id);
-		if(u != null)//borrar todas las plantas del usuario
-			gestorPlanta.deleteByIdUser(id);
-
 		
-		gestorUsuario.bajaUsurio(id);
-		u = gestorUsuario.findUsuarioById(id);
-		if (u == null) {
+		if (gestorUsuario.bajaUsurio(id)) {
 			return new ResponseEntity<Usuario>( HttpStatus.OK);// 200 OK
 		} else {
 			return new ResponseEntity<Usuario>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
