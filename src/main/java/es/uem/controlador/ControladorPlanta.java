@@ -124,18 +124,12 @@ public class ControladorPlanta {
 	@PreAuthorize("isAuthenticated()")
 	@PutMapping(path = "usuarios/{id}/plantas/finalizar", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Planta> terminarPlantaActual(@PathVariable("id") int id_user) {
-
-		Planta p = gestorPlanta.buscarPlantaActual(id_user);
-		System.out.println(p);
-		String[] partes;
-
-		partes = LocalDate.now().toString().split("-");
-		p.setFechaFin(partes[2]+"/"+partes[1]+"/"+partes[0]);
-
-		gestorPlanta.actualizar(p, id_user);
-		System.out.println(p);
-		return new ResponseEntity<Planta>(p, HttpStatus.OK);// 200 OK
-
+		Planta p = gestorPlanta.finalizarPlantaActual(id_user);
+		if(p != null) {
+			return new ResponseEntity<Planta>(p, HttpStatus.OK);// 200 OK
+		}else {
+			return new ResponseEntity<Planta>(HttpStatus.NOT_FOUND);// 404 NOT FOUND	
+		}
 	}
 
 	/**

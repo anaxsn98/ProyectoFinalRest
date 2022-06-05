@@ -133,18 +133,19 @@ public class Usuario implements UserDetails {
 	public void cambiosUsuairo(AltaUsuarioDto altaUser) {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-		if (!this.getNombre().equals(altaUser.getNombre())) // si los nombres no coinciden
+		if (!this.getNombre().equals(altaUser.getNombre()) && !altaUser.getNombre().equals("")) // si los nombres no coinciden
 			this.setNombre(altaUser.getNombre());
 
-		if (!this.getCorreo().equals(altaUser.getCorreo())) // si los Correos no coinciden
+		if (!this.getCorreo().equals(altaUser.getCorreo()) && !altaUser.getCorreo().equals("")) // si los Correos no coinciden
 			this.setCorreo(altaUser.getCorreo());
 
 		// password
-		String pwdEncode = passwordEncoder.encode(altaUser.getPwd());
-		if (!this.getPwd().equals(pwdEncode)) // si los pwd no coinciden
-			this.setPwd(pwdEncode);
-
-		if (!this.getCodigo_invernadero().equals(altaUser.getCodigo_invernadero())) // si los codigos no coinciden
+		if(!altaUser.getPwd().equals("")) {
+			String pwdEncode = passwordEncoder.encode(altaUser.getPwd());
+			if (!this.getPwd().equals(pwdEncode)) // si los pwd no coinciden
+				this.setPwd(pwdEncode);
+		}
+		if (!this.getCodigo_invernadero().equals(altaUser.getCodigo_invernadero()) && !altaUser.getCodigo_invernadero().equals("")) // si los codigos no coinciden
 			this.setCodigo_invernadero(altaUser.getCodigo_invernadero());
 
 	}

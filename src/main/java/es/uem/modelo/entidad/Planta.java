@@ -45,7 +45,7 @@ public class Planta {
 	private Integer id;
 	@Column(name = "nombre_planta")
 	private String nombre;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "id_tipoplanta", referencedColumnName = "id_tipoplanta")
 	private Tiposplanta tiposplanta;
@@ -78,23 +78,20 @@ public class Planta {
 
 	@Transient
 	private List<Evento> eventos;
-	@Transient
+
 	private String img;
-	
+
 	public String getImg() {
 		return img;
 	}
-
 
 	public void setImg(String img) {
 		this.img = img;
 	}
 
-
 	public Planta() {
 		super();
 	}
-
 
 	@Override
 	public String toString() {
@@ -106,211 +103,176 @@ public class Planta {
 				+ eventos + "]";
 	}
 
-
 	public Integer getId() {
 		return id;
 	}
-
 
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
-
 	public String getNombre() {
 		return nombre;
 	}
-
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
 
-
 	public Tiposplanta getTiposplanta() {
 		return tiposplanta;
 	}
-
 
 	public void setTiposplanta(Tiposplanta tiposplanta) {
 		this.tiposplanta = tiposplanta;
 	}
 
-
 	public String getFechaIni() {
 		return fechaIni;
 	}
-
 
 	public void setFechaIni(String fechaIni) {
 		this.fechaIni = fechaIni;
 	}
 
-
 	public String getFechaFin() {
 		return fechaFin;
 	}
-
 
 	public void setFechaFin(String fechaFin) {
 		this.fechaFin = fechaFin;
 	}
 
-
 	public Integer getRegar() {
 		return regar;
 	}
-
 
 	public void setRegar(Integer regar) {
 		this.regar = regar;
 	}
 
-
 	public Integer getIntervaloTiempoRiego() {
 		return intervaloTiempoRiego;
 	}
-
 
 	public void setIntervaloTiempoRiego(Integer intervaloTiempoRiego) {
 		this.intervaloTiempoRiego = intervaloTiempoRiego;
 	}
 
-
 	public Integer getMl() {
 		return ml;
 	}
-
 
 	public void setMl(Integer ml) {
 		this.ml = ml;
 	}
 
-
 	public Integer getLuz() {
 		return luz;
 	}
-
 
 	public void setLuz(Integer luz) {
 		this.luz = luz;
 	}
 
-
 	public Integer getIntervaloTiempoLuz() {
 		return intervaloTiempoLuz;
 	}
-
 
 	public void setIntervaloTiempoLuz(Integer intervaloTiempoLuz) {
 		this.intervaloTiempoLuz = intervaloTiempoLuz;
 	}
 
-
 	public Integer getMinLuz() {
 		return minLuz;
 	}
-
 
 	public void setMinLuz(Integer minLuz) {
 		this.minLuz = minLuz;
 	}
 
-
 	public Integer getVentilador() {
 		return ventilador;
 	}
-
 
 	public void setVentilador(Integer ventilador) {
 		this.ventilador = ventilador;
 	}
 
-
 	public Integer getIntervaloTiempoVentilador() {
 		return intervaloTiempoVentilador;
 	}
-
 
 	public void setIntervaloTiempoVentilador(Integer intervaloTiempoVentilador) {
 		this.intervaloTiempoVentilador = intervaloTiempoVentilador;
 	}
 
-
 	public Integer getMinVentilador() {
 		return minVentilador;
 	}
-
 
 	public void setMinVentilador(Integer minVentilador) {
 		this.minVentilador = minVentilador;
 	}
 
-
 	public String getAmor() {
 		return amor;
 	}
-
 
 	public void setAmor(String amor) {
 		this.amor = amor;
 	}
 
-
 	public Usuario getUsuario() {
 		return usuario;
 	}
-
 
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
 	}
 
-
 	public List<Evento> getEventos() {
 		return eventos;
 	}
-
 
 	public void setEventos(List<Evento> eventos) {
 		this.eventos = eventos;
 	}
 
-
 	public void inicializarEventos() {
-		Evento regar,luz,ventilar;
-		String dia,mes,anio;
+		Evento regar, luz, ventilar;
+		String dia, mes, anio;
 		String[] partes;
 		this.eventos = new ArrayList<Evento>();
 		regar = new Evento();
 		luz = new Evento();
 		ventilar = new Evento();
 		partes = this.fechaIni.split("/");
-		
-		LocalDate d1 = LocalDate.parse(partes[2]+"-"+partes[1]+"-"+partes[0], DateTimeFormatter.ISO_LOCAL_DATE);
-		
+
+		LocalDate d1 = LocalDate.parse(partes[2] + "-" + partes[1] + "-" + partes[0], DateTimeFormatter.ISO_LOCAL_DATE);
+
 		regar.setTitulo("Regar");
 		regar.setColor("#1e90ff");
 		regar.setMes1(d1);
 		regar.initHashSet();
 		regar.actualizarMeses(this.intervaloTiempoRiego);
-		
+
 		luz.setTitulo("Luz");
 		luz.setColor("#e3bc08");
 		luz.setMes1(d1);
 		luz.initHashSet();
 		luz.actualizarMeses(this.intervaloTiempoLuz);
-		
+
 		ventilar.setTitulo("Ventilacion");
 		ventilar.setColor("#b80900");
 		ventilar.setMes1(d1);
 		ventilar.initHashSet();
 		ventilar.actualizarMeses(this.intervaloTiempoVentilador);
-		
+
 		this.eventos.add(ventilar);
 		this.eventos.add(luz);
 		this.eventos.add(regar);
-		
+
 	}
-	
+
 }

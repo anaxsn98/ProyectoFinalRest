@@ -153,8 +153,10 @@ public class GestorUsuario implements UserDetailsService{
 	public boolean bajaUsurio(int id) {
 		//borrar plantas del usuario
 		List<Planta> plantas =  gestorPlanta.findAllByUsuario_id(id);
-		for (Planta planta : plantas) {
-			gestorPlanta.deleteById(planta.getId());
+		if(plantas != null) {
+			for (Planta planta : plantas) {
+				gestorPlanta.deleteById(planta.getId());
+			}
 		}
 		
 		daoUsuario.deleteById(id);

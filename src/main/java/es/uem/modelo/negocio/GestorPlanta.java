@@ -1,5 +1,6 @@
 package es.uem.modelo.negocio;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import es.uem.modelo.entidad.Tiposplanta;
 import es.uem.modelo.persistencia.DaoPlanta;
 import es.uem.modelo.persistencia.DaoTiposplanta;
 import es.uem.usuario.persistencia.DaoUsuario;
+
 @Service
 public class GestorPlanta {
 	@Autowired
@@ -83,11 +85,14 @@ public class GestorPlanta {
 		int id_tipoplanta;
 		Tiposplanta t;
 		Planta p = daoPlanta.buscarPlantaActual(id);
-		id_tipoplanta = daoPlanta.buscarIdTipoPlantaDePlanta(p.getId());
-		t = daoTiposplanta.findById(id_tipoplanta);
+		if (p != null) {
+			id_tipoplanta = daoPlanta.buscarIdTipoPlantaDePlanta(p.getId());
+			t = daoTiposplanta.findById(id_tipoplanta);
 
-		p.setImg(t.getImg_url());
-		return p;
+			p.setImg(t.getImg_url());
+			return p;
+		}
+		return null;
 	}
 
 	public List<Planta> findAllByUsuario_id(int id) {
@@ -103,6 +108,7 @@ public class GestorPlanta {
 	}
 
 	public Planta guardar(Planta p, int id_user) {
+		finalizarPlantaActual(id_user);
 
 		if (plantasPorDefecto == null) {
 			System.out.println("inicializado");
@@ -110,7 +116,7 @@ public class GestorPlanta {
 		}
 		// miramos el tipo de planta que es
 		if (p.getTiposplanta() != null && p.getTiposplanta().getId_tipoplanta() < 4) {// si es una por defecto
-			Planta planta = plantasPorDefecto.get(p.getTiposplanta().getId_tipoplanta() - 1);
+			Planta planta = plantasPorDefecto.get(p.getTiposplanta().getId_tipoplanta()-1);
 			p.setMl(planta.getMl());
 			p.setMinLuz(planta.getMinLuz());
 			p.setMinVentilador(planta.getMinVentilador());
@@ -129,7 +135,7 @@ public class GestorPlanta {
 			p.setFechaIni(p.getFechaIni());
 			p.setUsuario(p.getUsuario());
 			System.out.println(planta);
-		}else {
+		} else {
 			p.setRegar(0);
 			p.setLuz(0);
 			p.setVentilador(0);
@@ -148,12 +154,24 @@ public class GestorPlanta {
 		daoPlanta.save(p);
 	}
 
+	public Planta finalizarPlantaActual(int id_user) {
+		String[] partes;
+		Planta p = buscarPlantaActual(id_user);
+		if (p != null) {
+			partes = LocalDate.now().toString().split("-");
+			p.setFechaFin(partes[2] + "/" + partes[1] + "/" + partes[0]);
+
+			return daoPlanta.save(p);
+		}
+		return null;
+	}
+
 	public int deleteByIdUser(int id) {
 		return daoPlanta.deleteByIdUser(id);
 	}
-	
+
 	public Planta deleteById(int id) {
 		daoPlanta.deleteById(id);
-		return daoPlanta.findById(id);		
+		return daoPlanta.findById(id);
 	}
 }
