@@ -22,12 +22,12 @@ public class GestorPlanta {
 	@Autowired
 	private DaoTiposplanta daoTiposplanta;
 	private List<Planta> plantasPorDefecto;// 0 Hierba buena, 1 Perejil, 2 Cherrys
-
+	List<Tiposplanta> tipos;
 	/**
 	 * Método que inicializa los valores de las plantas por defecto
 	 */
 	public void inicializarListaPlantasPorDefecto() {
-		List<Tiposplanta> tipos = daoTiposplanta.findAll();
+		tipos = daoTiposplanta.findAll();
 		// 1 Hierba buena, 2 Perejil, 3 Cherrys, 4 Personalizada
 		plantasPorDefecto = new ArrayList<>();
 		Planta p = new Planta();
@@ -86,10 +86,6 @@ public class GestorPlanta {
 		Tiposplanta t;
 		Planta p = daoPlanta.buscarPlantaActual(id);
 		if (p != null) {
-			id_tipoplanta = daoPlanta.buscarIdTipoPlantaDePlanta(p.getId());
-			t = daoTiposplanta.findById(id_tipoplanta);
-
-			p.setImg(t.getImg_url());
 			return p;
 		}
 		return null;
@@ -129,17 +125,15 @@ public class GestorPlanta {
 			p.setIntervaloTiempoLuz(planta.getIntervaloTiempoLuz());
 			p.setIntervaloTiempoVentilador(planta.getIntervaloTiempoVentilador());
 
-			// p.setTiposplanta(planta.getTiposplanta());
-
-			p.setNombre(p.getNombre());
-			p.setFechaIni(p.getFechaIni());
-			p.setUsuario(p.getUsuario());
-			System.out.println(planta);
+			
 		} else {
 			p.setRegar(0);
 			p.setLuz(0);
 			p.setVentilador(0);
 		}
+		
+		if(p.getImg() != null && p.getImg().equals(""))
+			p.setImg(tipos.get(p.getTiposplanta().getId_tipoplanta()).getImg_url());
 
 		p.setUsuario(daoUsuario.findById(id_user));
 
