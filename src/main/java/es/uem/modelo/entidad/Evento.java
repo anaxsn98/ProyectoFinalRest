@@ -1,6 +1,7 @@
 package es.uem.modelo.entidad;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -12,7 +13,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 public class Evento {
 	private String titulo;
 	private String color;
-	private LocalDate mes1;/* Mes Inicial de creación de la planta */
+	private LocalDate mes1;/* Mes Inicial de creación de la planta yyyy-mm-dd*/
 	private HashSet<String> meses;
 
 //	public static void main(String[] args) {
@@ -66,7 +67,7 @@ public class Evento {
 		}//3 nada
 
 	}
-
+	
 	public void imprimirMeses() {
 		for (String s : meses) {
 			System.out.println(s);

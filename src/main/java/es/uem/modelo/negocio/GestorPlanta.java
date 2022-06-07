@@ -82,8 +82,6 @@ public class GestorPlanta {
 	}
 
 	public Planta buscarPlantaActual(int id) {
-		int id_tipoplanta;
-		Tiposplanta t;
 		Planta p = daoPlanta.buscarPlantaActual(id);
 		if (p != null) {
 			return p;
@@ -126,11 +124,15 @@ public class GestorPlanta {
 			p.setIntervaloTiempoVentilador(planta.getIntervaloTiempoVentilador());
 
 			
-		} else {
-			p.setRegar(0);
-			p.setLuz(0);
-			p.setVentilador(0);
 		}
+		
+		//campos que interactuan con el invernadero 1 sí 0 no
+		p.setRegar(0);
+		p.setLuz(0);
+		p.setVentilador(0);
+		
+		//cuando se da de alta una planta no puede haber fecha final
+		p.setFechaFin(null);
 		
 		if(p.getImg() != null && p.getImg().equals(""))
 			p.setImg(tipos.get(p.getTiposplanta().getId_tipoplanta()).getImg_url());
@@ -158,6 +160,17 @@ public class GestorPlanta {
 			return daoPlanta.save(p);
 		}
 		return null;
+	}
+	
+	public List<Integer> progressbar(int id_user){
+		List<Integer> listaNumProgressBar = new ArrayList<Integer>();
+		Planta p = buscarPlantaActual(id_user);
+		if(p != null) {
+			listaNumProgressBar.add(p.generarNumProgressbar(p.getIntervaloTiempoLuz()));
+			listaNumProgressBar.add(p.generarNumProgressbar(p.getIntervaloTiempoRiego()));
+			listaNumProgressBar.add(p.generarNumProgressbar(p.getIntervaloTiempoVentilador()));
+		}
+		return listaNumProgressBar;
 	}
 
 	public int deleteByIdUser(int id) {
