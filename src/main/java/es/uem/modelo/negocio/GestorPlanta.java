@@ -23,6 +23,7 @@ public class GestorPlanta {
 	private DaoTiposplanta daoTiposplanta;
 	private List<Planta> plantasPorDefecto;// 0 Hierba buena, 1 Perejil, 2 Cherrys
 	List<Tiposplanta> tipos;
+
 	/**
 	 * Método que inicializa los valores de las plantas por defecto
 	 */
@@ -91,6 +92,17 @@ public class GestorPlanta {
 		return null;
 	}
 
+	public List<Integer> progressbar(int id_user) {
+		List<Integer> listaNumProgressBar = new ArrayList<Integer>();
+		Planta p = buscarPlantaActual(id_user);
+		if (p != null) {
+			listaNumProgressBar.add(p.generarNumProgressbar(p.getIntervaloTiempoLuz()));
+			listaNumProgressBar.add(p.generarNumProgressbar(p.getIntervaloTiempoRiego()));
+			listaNumProgressBar.add(p.generarNumProgressbar(p.getIntervaloTiempoVentilador()));
+		}
+		return listaNumProgressBar;
+	}
+
 	public List<Planta> findAllByUsuario_id(int id) {
 		int id_tipoplanta;
 
@@ -112,7 +124,7 @@ public class GestorPlanta {
 		}
 		// miramos el tipo de planta que es
 		if (p.getTiposplanta() != null && p.getTiposplanta().getId_tipoplanta() < 4) {// si es una por defecto
-			Planta planta = plantasPorDefecto.get(p.getTiposplanta().getId_tipoplanta()-1);
+			Planta planta = plantasPorDefecto.get(p.getTiposplanta().getId_tipoplanta() - 1);
 			p.setMl(planta.getMl());
 			p.setMinLuz(planta.getMinLuz());
 			p.setMinVentilador(planta.getMinVentilador());
@@ -125,15 +137,20 @@ public class GestorPlanta {
 			p.setIntervaloTiempoLuz(planta.getIntervaloTiempoLuz());
 			p.setIntervaloTiempoVentilador(planta.getIntervaloTiempoVentilador());
 
-			
-		} else {
-			p.setRegar(0);
-			p.setLuz(0);
-			p.setVentilador(0);
 		}
-		
-		if(p.getImg() != null && p.getImg().equals(""))
-			p.setImg(tipos.get(p.getTiposplanta().getId_tipoplanta()).getImg_url());
+
+		// campos que interactuan con el invernadero 1 sí 0 no
+		p.setRegar(0);
+		p.setLuz(0);
+		p.setVentilador(0);
+
+		// cuando se da de alta una planta no puede haber fecha final
+		p.setFechaFin(null);
+
+		if (p.getImg() != null && p.getImg().equals("")) {
+			Tiposplanta t = daoTiposplanta.findById(p.getTiposplanta().getId_tipoplanta());
+			p.setImg(t.getImg_url());
+		}
 
 		p.setUsuario(daoUsuario.findById(id_user));
 

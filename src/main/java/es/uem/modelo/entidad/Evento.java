@@ -2,17 +2,14 @@ package es.uem.modelo.entidad;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
-import java.util.List;
 
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
 public class Evento {
 	private String titulo;
 	private String color;
-	private LocalDate mes1;/* Mes Inicial de creación de la planta */
+	private LocalDate mes1;/* Mes Inicial de creación de la planta yyyy-mm-dd*/
 	private HashSet<String> meses;
 
 //	public static void main(String[] args) {

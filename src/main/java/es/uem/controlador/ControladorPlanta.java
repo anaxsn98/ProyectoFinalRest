@@ -39,13 +39,28 @@ public class ControladorPlanta {
 	@GetMapping(path = "usuarios/{id}/plantas/eventos", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Evento>> getEvento(@PathVariable("id") int id_usuario) {
 		Planta p = gestorPlanta.buscarPlantaActual(id_usuario);
-		if (p != null)
+		if (p != null) {
 			p.inicializarEventos();
-
-		if (p.getEventos() != null) {
 			return new ResponseEntity<List<Evento>>(p.getEventos(), HttpStatus.OK);// 200 OK
 		} else {
 			return new ResponseEntity<List<Evento>>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
+		}
+	}
+	
+	/**
+	 * Devuelve los numeros que van a determinar la progressbar
+	 * 
+	 * @param nombre nombre de la planta que se quiere buscar en la bbdd
+	 * @return el codigo 200 "OK" si existe o 404 NOT FOUND si no existe
+	 */
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping(path = "usuarios/{id}/plantas/progress", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Integer>> getProgressBar(@PathVariable("id") int id_usuario) {
+		List<Integer> lista = gestorPlanta.progressbar(id_usuario);
+		if (lista != null) {
+			return new ResponseEntity<List<Integer>>(lista, HttpStatus.OK);// 200 OK
+		} else {
+			return new ResponseEntity<List<Integer>>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
 		}
 	}
 

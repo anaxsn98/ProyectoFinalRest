@@ -5,32 +5,25 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import es.uem.usuario.modelo.Usuario;
 
 import javax.persistence.JoinColumn;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 
 //Anotaciones Spring
 @Component
@@ -52,19 +45,19 @@ public class Planta {
 	private String fechaIni;
 	private String fechaFin;
 	@Column(name = "querer_regar")
-	private Integer regar;// 0 sí 1 no
+	private Integer regar;// 1 sí 0 no
 	@Column(name = "info_regar")
 	private Integer intervaloTiempoRiego;// 0 una vez al dia, 1 una vez a la semana, 2 una vez al mes, 3 no regar
 	@Column(name = "ml_regar")
 	private Integer ml;
 	@Column(name = "querer_luz")
-	private Integer luz; // 0 sí 1 no
+	private Integer luz; // 1 sí 0 no
 	@Column(name = "info_luz")
 	private Integer intervaloTiempoLuz;// 0 una vez al dia, 1 una vez a la semana, 2 una vez al mes
 	@Column(name = "min_luz")
 	private Integer minLuz;
 	@Column(name = "querer_ventilar")
-	private Integer ventilador; // 0 sí 1 no
+	private Integer ventilador; // 1 sí 0 no
 	@Column(name = "info_ventilar")
 	private Integer intervaloTiempoVentilador;// 0 una vez al dia, 1 una vez a la semana, 2 una vez al mes
 	@Column(name = "min_ventilar")
@@ -275,4 +268,43 @@ public class Planta {
 
 	}
 
+	public int generarNumProgressbar(int intervaloTiempo) {
+		String[] partes;
+		LocalDate mes1;
+		LocalDate actual = LocalDate.now();
+		partes = this.fechaIni.split("/");
+
+		mes1 = LocalDate.parse(partes[2] + "-" + partes[1] + "-" + partes[0], DateTimeFormatter.ISO_LOCAL_DATE);
+
+		Period period = Period.between(mes1, actual);
+		double tiempo = 0;
+		int porcentaje=0;long semanas = 0;
+
+		if (intervaloTiempo == 0) {//dia
+			//horas que quedan hasta el día siguiente
+			LocalDateTime now = LocalDateTime.now();
+			porcentaje = 24 - now.getHour();
+			porcentaje = (int) Math.round((porcentaje * 100) / 24);
+		} else if (intervaloTiempo == 1) {//semana
+			//semanas que han pasado entre la semana de inicio de la planta y la semana actual
+			semanas = ChronoUnit.WEEKS.between(mes1, actual);
+			//obtener fecha de la siguiente semana
+			LocalDate next = mes1.plusWeeks(semanas+1);
+			//calcular los días que quedan desde la fecha actual hasta la siguiente fecha
+			tiempo = ChronoUnit.DAYS.between(actual, next);
+			//si 7 días está al 100% en i días estará a x%
+			porcentaje =  (int) Math.round((tiempo * 100) / 7);
+			System.out.println("SEMANA. "+mes1+" "+next+" "+tiempo);
+		} else if (intervaloTiempo == 2) {//mes
+			//meses que han pasado entre la semana de inicio de la planta y la semana actual
+			semanas = ChronoUnit.MONTHS.between(mes1, actual);
+			//obtener fecha del siguiente mese
+			LocalDate next = mes1.plusMonths(semanas+1);
+			//calcular los días que quedan desde la fecha actual hasta la siguiente fecha
+			tiempo = ChronoUnit.DAYS.between(actual, next);
+			porcentaje =  (int) Math.round((tiempo * 100) / actual.lengthOfMonth());
+			System.out.println("SEMANA. "+mes1+" "+next+" "+tiempo);
+		}//3 nada
+		return porcentaje;
+	}
 }
