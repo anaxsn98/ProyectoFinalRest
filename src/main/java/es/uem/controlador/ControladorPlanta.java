@@ -55,7 +55,7 @@ public class ControladorPlanta {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "usuarios/{id}/plantas/progress", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Integer>> getProgressBat(@PathVariable("id") int id_usuario) {
+	public ResponseEntity<List<Integer>> getProgressBar(@PathVariable("id") int id_usuario) {
 		List<Integer> lista = gestorPlanta.progressbar(id_usuario);
 		if (lista != null) {
 			return new ResponseEntity<List<Integer>>(lista, HttpStatus.OK);// 200 OK

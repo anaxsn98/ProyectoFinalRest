@@ -90,14 +90,7 @@ public class GestorPlanta {
 	}
 
 	public List<Planta> findAllByUsuario_id(int id) {
-		int id_tipoplanta;
-
 		List<Planta> p = daoPlanta.findAllByUsuario_id(id);
-		for (Planta planta : p) {
-			id_tipoplanta = daoPlanta.buscarIdTipoPlantaDePlanta(planta.getId());
-			Tiposplanta t = daoTiposplanta.findById(id_tipoplanta);
-			planta.setImg(t.getImg_url());
-		}
 		return p;
 	}
 
@@ -134,9 +127,10 @@ public class GestorPlanta {
 		//cuando se da de alta una planta no puede haber fecha final
 		p.setFechaFin(null);
 		
-		if(p.getImg() != null && p.getImg().equals(""))
-			p.setImg(tipos.get(p.getTiposplanta().getId_tipoplanta()).getImg_url());
-
+		if(p.getImg() != null && p.getImg().equals("")) {
+			Tiposplanta t = daoTiposplanta.findById(p.getTiposplanta().getId_tipoplanta());
+			p.setImg(t.getImg_url());
+		}
 		p.setUsuario(daoUsuario.findById(id_user));
 
 		daoPlanta.save(p);
