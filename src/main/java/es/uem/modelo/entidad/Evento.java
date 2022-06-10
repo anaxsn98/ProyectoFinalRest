@@ -5,62 +5,57 @@ import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 
-
 public class Evento {
 	private String titulo;
 	private String color;
-	private LocalDate mes1;/* Mes Inicial de creación de la planta yyyy-mm-dd*/
+	private LocalDate mes1;/* Mes Inicial de creación de la planta yyyy-mm-dd */
 	private HashSet<String> meses;
 
-//	public static void main(String[] args) {
-//		LocalDate d1 = LocalDate.parse("2022-01-01", DateTimeFormatter.ISO_LOCAL_DATE);
-//		Evento e = new Evento();
-//		e.setMes1(d1);
-//		e.initHashSet();
-//		e.actualizarMeses(1);
-//		e.imprimirMeses();
-//	}
-
+	/**
+	 * Método que inicializa el hashset
+	 */
 	public void initHashSet() {
 		meses = new HashSet<String>();
 	}
 
 	/**
-	 * Calcula la diferencia entre la fecha de creación y la actual. Guarda las
-	 * fechas de cada mes desde la fecha de creación hasta la actual más los 4 meses
-	 * siguientes.
+	 * Dependiendo del intervalo de tiempo que se le pase calcula los
+	 * días/meses/semanas que han pasado desde la creación dela planta (mes1) hasta
+	 * el mes actual más los 4 siguientes meses. Una vez calculado el tiempo se
+	 * guardan fechas en el hashset dependiendo del intervalo de tiempo si es 0 se
+	 * guardan todos los dias que pasen, si es 1 se guarda un día a la semana y si
+	 * es 2 se guarda un día al més
 	 * 
 	 * @param intervaloTiempo 0 una vez al dia, 1 una vez a la semana, 2 una vez al
 	 *                        mes, 3 no regar
 	 */
 	public void actualizarMeses(int intervaloTiempo) {
 		LocalDate actual = LocalDate.now();
-		Period period = Period.between(mes1, actual);
 		long months = 0;
-
-		if (intervaloTiempo == 0) {//dia
+		LocalDate m = mes1;
+		if (intervaloTiempo == 0) {// dia
 			months = ChronoUnit.DAYS.between(mes1, actual.plusMonths(4));
 			for (int i = 0; i < months + 4; i++) {
-				LocalDate m = mes1.plusDays(i);
+				m = m.plusDays(1);
 				String s = Integer.toString(m.getDayOfMonth()) + "/" + m.getMonthValue() + "/" + m.getYear();
 				meses.add(s);
 			}
-		} else if (intervaloTiempo == 1) {//semana
+		} else if (intervaloTiempo == 1) {// semana
 			months = ChronoUnit.WEEKS.between(mes1, actual.plusMonths(4));
 			for (int i = 0; i < months + 4; i++) {
-				LocalDate m = mes1.plusWeeks(i);
+				m = m.plusWeeks(1);
 				String s = Integer.toString(m.getDayOfMonth()) + "/" + m.getMonthValue() + "/" + m.getYear();
 				meses.add(s);
 			}
-		} else if (intervaloTiempo == 2) {//mes
-			months = Math.abs(period.getMonths());
+		} else if (intervaloTiempo == 2) {// mes
+			months = ChronoUnit.MONTHS.between(mes1, actual.plusMonths(4));
 			for (int i = 0; i < months + 4; i++) {
-				LocalDate m = mes1.plusMonths(i);
+				m = m.plusMonths(1);
 				String s = Integer.toString(m.getDayOfMonth()) + "/" + m.getMonthValue() + "/" + m.getYear();
 				meses.add(s);
 			}
 
-		}//3 nada
+		} // 3 nada
 
 	}
 

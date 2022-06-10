@@ -28,7 +28,7 @@ public class GestorUsuario implements UserDetailsService{
 
 	/**
 	 * Método que comprueba que las reglas de negocio. Comprueba que el correo sea
-	 * válido, que el nombre, el codigo de invernadero y el correo sean más de 4
+	 * válido, que el nombre, el codigo de invernadero y el correo sean más de 6
 	 * caracteres y que las contraseñas coincidan
 	 * 
 	 * @param nombre del usuairo
@@ -56,7 +56,7 @@ public class GestorUsuario implements UserDetailsService{
 	 * codigo de invernadero y el correo sean más de 4 caracteres y que las
 	 * contraseñas coincidan
 	 * 
-	 * @param usuario usuairo que se quiere dar de alta
+	 * @param altaUsuarioDto usuairo que se quiere dar de alta
 	 * @return false si no se ha podido dar de alta el usuario, true en caso
 	 *         contrario
 	 */
@@ -82,6 +82,7 @@ public class GestorUsuario implements UserDetailsService{
 	 * Guardar modificaciones del usuario. Primero comprueba que el usuario existe en la bbdd.
 	 * Luego comprueba que se siguen las reglas de negocio. Y por último guarda el usuario en la bbdd.
 	 * @param altaUsuarioDto usuario con los datos nuevos
+	 * @param id del usuario
 	 * @return true si se han guardado los cambios, false en caso contrario
 	 */
 	public boolean guardarCambiosUsuairo(AltaUsuarioDto altaUsuarioDto, int id) {
@@ -100,28 +101,6 @@ public class GestorUsuario implements UserDetailsService{
 			return true;
 		}
 		return false;
-	}
-	
-	/**
-	 * Buscar un usuario por nombre y contraseña
-	 * 
-	 * @param nombre nombre del usuario que quieres buscar
-	 * @param pwd    contraseña del usuario que quieres buscar
-	 * @return null o usuario encontrado
-	 */
-	public Usuario findByNombreAndPwd(String nombre, String pwd) {
-		return daoUsuario.findByNombreAndPwd(nombre, pwd);
-	}
-
-	/**
-	 * Buscar un usuario por correo y contraseña
-	 * 
-	 * @param correo correo del usuario que quieres buscar
-	 * @param pwd    contraseña del usuario que quieres buscar
-	 * @return null o usuario encontrado
-	 */
-	public Usuario findByCorreoAndPwd(String correo, String pwd) {
-		return daoUsuario.findByCorreoAndPwd(correo, pwd);
 	}
 
 	/**
@@ -172,14 +151,15 @@ public class GestorUsuario implements UserDetailsService{
 		return daoUsuario.findById(id);
 	}
 
+	/**
+	 * Buscar usuario por nombre o por correo
+	 */
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Usuario user = daoUsuario.findByNombre(username);
 		//Búsqueda por correo
 		if(user == null)
 			user = daoUsuario.findByCorreo(username);
-		
-		System.out.println(user);
 		return user;
 	}
 }

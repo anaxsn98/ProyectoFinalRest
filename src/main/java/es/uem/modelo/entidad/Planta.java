@@ -17,7 +17,6 @@ import javax.persistence.Transient;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-
 import es.uem.usuario.modelo.Usuario;
 
 import javax.persistence.JoinColumn;
@@ -38,7 +37,6 @@ public class Planta {
 	private Integer id;
 	@Column(name = "nombre_planta")
 	private String nombre;
-
 	@ManyToOne
 	@JoinColumn(name = "id_tipoplanta", referencedColumnName = "id_tipoplanta")
 	private Tiposplanta tiposplanta;
@@ -64,11 +62,10 @@ public class Planta {
 	private Integer minVentilador;
 	@Column(name = "cantidad_amor")
 	private String amor;
-
 	@ManyToOne()
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
 	private Usuario usuario;
-
+	// para que no se persista en la base de datos ponemos la anotación @Transient
 	@Transient
 	private List<Evento> eventos;
 
@@ -84,16 +81,6 @@ public class Planta {
 
 	public Planta() {
 		super();
-	}
-
-	@Override
-	public String toString() {
-		return "Planta [id=" + id + ", nombre=" + nombre + ", tiposplanta=" + tiposplanta + ", fechaIni=" + fechaIni
-				+ ", fechaFin=" + fechaFin + ", regar=" + regar + ", intervaloTiempoRiego=" + intervaloTiempoRiego
-				+ ", ml=" + ml + ", luz=" + luz + ", intervaloTiempoLuz=" + intervaloTiempoLuz + ", minLuz=" + minLuz
-				+ ", ventilador=" + ventilador + ", intervaloTiempoVentilador=" + intervaloTiempoVentilador
-				+ ", minVentilador=" + minVentilador + ", amor=" + amor + ", usuario=" + usuario + ", eventos="
-				+ eventos + "]";
 	}
 
 	public Integer getId() {
@@ -232,17 +219,34 @@ public class Planta {
 		this.eventos = eventos;
 	}
 
+	@Override
+	public String toString() {
+		return "Planta [id=" + id + ", nombre=" + nombre + ", tiposplanta=" + tiposplanta + ", fechaIni=" + fechaIni
+				+ ", fechaFin=" + fechaFin + ", regar=" + regar + ", intervaloTiempoRiego=" + intervaloTiempoRiego
+				+ ", ml=" + ml + ", luz=" + luz + ", intervaloTiempoLuz=" + intervaloTiempoLuz + ", minLuz=" + minLuz
+				+ ", ventilador=" + ventilador + ", intervaloTiempoVentilador=" + intervaloTiempoVentilador
+				+ ", minVentilador=" + minVentilador + ", amor=" + amor + ", usuario=" + usuario + ", eventos="
+				+ eventos + "]";
+	}
+
+	/**
+	 * Genera una lista de eventos de la planta. Un evento para el riego, otro para
+	 * la luz y otro para la ventilación dependiendo del intervalo de tiempo
+	 * asociado a cada uno.
+	 */
 	public void inicializarEventos() {
 		Evento regar, luz, ventilar;
 		String dia, mes, anio;
 		String[] partes;
+		LocalDate d1;
+
 		this.eventos = new ArrayList<Evento>();
 		regar = new Evento();
 		luz = new Evento();
 		ventilar = new Evento();
 		partes = this.fechaIni.split("/");
 
-		LocalDate d1 = LocalDate.parse(partes[2] + "-" + partes[1] + "-" + partes[0], DateTimeFormatter.ISO_LOCAL_DATE);
+		d1 = LocalDate.parse(partes[2] + "-" + partes[1] + "-" + partes[0], DateTimeFormatter.ISO_LOCAL_DATE);
 
 		regar.setTitulo("Regar");
 		regar.setColor("#1e90ff");
@@ -268,43 +272,52 @@ public class Planta {
 
 	}
 
+	/**
+	 * Genera un porcentaje dependiendo de los días que queden para que se realice
+	 * el siguiente evento de riego, luz y ventilación.
+	 * 
+	 * @param intervaloTiempo
+	 * @return
+	 */
 	public int generarNumProgressbar(int intervaloTiempo) {
 		String[] partes;
 		LocalDate mes1;
 		LocalDate actual = LocalDate.now();
-		partes = this.fechaIni.split("/");
 
+		partes = this.fechaIni.split("/");
 		mes1 = LocalDate.parse(partes[2] + "-" + partes[1] + "-" + partes[0], DateTimeFormatter.ISO_LOCAL_DATE);
 
-		Period period = Period.between(mes1, actual);
 		double tiempo = 0;
-		int porcentaje=0;long semanas = 0;
+		int porcentaje = 0;
+		long semanas = 0;
 
-		if (intervaloTiempo == 0) {//dia
-			//horas que quedan hasta el día siguiente
+		if (intervaloTiempo == 0) {// dia
+			// horas que quedan hasta el día siguiente
 			LocalDateTime now = LocalDateTime.now();
 			porcentaje = 24 - now.getHour();
 			porcentaje = (int) Math.round((porcentaje * 100) / 24);
-		} else if (intervaloTiempo == 1) {//semana
-			//semanas que han pasado entre la semana de inicio de la planta y la semana actual
+		} else if (intervaloTiempo == 1) {// semana
+			// semanas que han pasado entre la semana de inicio de la planta y la semana
+			// actual
 			semanas = ChronoUnit.WEEKS.between(mes1, actual);
-			//obtener fecha de la siguiente semana
-			LocalDate next = mes1.plusWeeks(semanas+1);
-			//calcular los días que quedan desde la fecha actual hasta la siguiente fecha
+			// obtener fecha de la siguiente semana
+			LocalDate next = mes1.plusWeeks(semanas + 1);
+			// calcular los días que quedan desde la fecha actual hasta la siguiente fecha
 			tiempo = ChronoUnit.DAYS.between(actual, next);
-			//si 7 días está al 100% en i días estará a x%
-			porcentaje =  (int) Math.round((tiempo * 100) / 7);
-			System.out.println("SEMANA. "+mes1+" "+next+" "+tiempo);
-		} else if (intervaloTiempo == 2) {//mes
-			//meses que han pasado entre la semana de inicio de la planta y la semana actual
+			// si 7 días está al 100% en i días estará a x%
+			porcentaje = (int) Math.round((tiempo * 100) / 7);
+			System.out.println("SEMANA. " + mes1 + " " + next + " " + tiempo);
+		} else if (intervaloTiempo == 2) {// mes
+			// meses que han pasado entre la semana de inicio de la planta y la semana
+			// actual
 			semanas = ChronoUnit.MONTHS.between(mes1, actual);
-			//obtener fecha del siguiente mese
-			LocalDate next = mes1.plusMonths(semanas+1);
-			//calcular los días que quedan desde la fecha actual hasta la siguiente fecha
+			// obtener fecha del siguiente mese
+			LocalDate next = mes1.plusMonths(semanas + 1);
+			// calcular los días que quedan desde la fecha actual hasta la siguiente fecha
 			tiempo = ChronoUnit.DAYS.between(actual, next);
-			porcentaje =  (int) Math.round((tiempo * 100) / actual.lengthOfMonth());
-			System.out.println("SEMANA. "+mes1+" "+next+" "+tiempo);
-		}//3 nada
+			porcentaje = (int) Math.round((tiempo * 100) / actual.lengthOfMonth());
+			System.out.println("SEMANA. " + mes1 + " " + next + " " + tiempo);
+		} // 3 nada
 		return porcentaje;
 	}
 }

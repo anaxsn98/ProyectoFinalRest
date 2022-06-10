@@ -82,11 +82,6 @@ public class AuthenticationController {
 			throw new Exception("INVALID_CREDENTIALS", e);
 		}
 	}
-	
-	private JwtResponse convertUserEntityAndTokenToJwtUserResponse(Usuario user, String jwtToken) {
-		return new JwtResponse(jwtToken, Integer.toString(user.getId()),user.getNombre());
-
-	}
 
 	@PostMapping(path = "usuarios", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public JwtResponse altaPersona(@RequestBody AltaUsuarioDto u) {

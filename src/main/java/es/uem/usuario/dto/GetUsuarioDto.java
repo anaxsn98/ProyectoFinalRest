@@ -1,5 +1,8 @@
 package es.uem.usuario.dto;
 
+/**
+ * Clase usada para la petición al servicio devolver datos de usuario
+ */
 public class GetUsuarioDto {
 	private int id;
 	private String correo;

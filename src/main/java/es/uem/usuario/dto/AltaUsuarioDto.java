@@ -2,6 +2,9 @@ package es.uem.usuario.dto;
 
 import javax.persistence.Column;
 
+/**
+ * Clase usada para la petición al servicio dar de alta al usuario
+ */
 public class AltaUsuarioDto {
 	private String correo;
 	private String nombre;

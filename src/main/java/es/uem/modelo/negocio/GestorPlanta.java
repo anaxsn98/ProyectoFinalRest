@@ -25,7 +25,7 @@ public class GestorPlanta {
 	List<Tiposplanta> tipos;
 
 	/**
-	 * Método que inicializa los valores de las plantas por defecto
+	 * Método que inicializa la lista de tiposplanta con los valores por defecto
 	 */
 	public void inicializarListaPlantasPorDefecto() {
 		tipos = daoTiposplanta.findAll();
@@ -82,16 +82,23 @@ public class GestorPlanta {
 		plantasPorDefecto.add(p3);// 3 Cherrys
 	}
 
+	/**
+	 * Búsqueda de la planta actual por id de usuario
+	 * 
+	 * @param id id de usuario
+	 * @return la planta actual o null si no se ha encontrado
+	 */
 	public Planta buscarPlantaActual(int id) {
-		int id_tipoplanta;
-		Tiposplanta t;
 		Planta p = daoPlanta.buscarPlantaActual(id);
-		if (p != null) {
-			return p;
-		}
-		return null;
+		return p;
 	}
 
+	/**
+	 * Devuelve una lista de porcentajes para cada evento de la planta actual
+	 * 
+	 * @param id_user id del usuario
+	 * @return lista de porcentajes o null si el usuario no tiene una planta actual
+	 */
 	public List<Integer> progressbar(int id_user) {
 		List<Integer> listaNumProgressBar = new ArrayList<Integer>();
 		Planta p = buscarPlantaActual(id_user);
@@ -103,21 +110,32 @@ public class GestorPlanta {
 		return listaNumProgressBar;
 	}
 
+	/**
+	 * Buscar todas las plantas del usuario
+	 * 
+	 * @param id id de usuario
+	 * @return lista de plantas o null si el ususairo no tiene ninguna planta
+	 *         asociada
+	 */
 	public List<Planta> findAllByUsuario_id(int id) {
-		int id_tipoplanta;
-
 		List<Planta> p = daoPlanta.findAllByUsuario_id(id);
-		for (Planta planta : p) {
-			id_tipoplanta = daoPlanta.buscarIdTipoPlantaDePlanta(planta.getId());
-			Tiposplanta t = daoTiposplanta.findById(id_tipoplanta);
-			planta.setImg(t.getImg_url());
-		}
 		return p;
 	}
 
+	/**
+	 * Guarda en la base de datos una planta asociada a un usuario. Si es una planta
+	 * por defecto se le asignan los datos por defecto. Los campos que interactuan
+	 * con el invernadero se ponen a 0 para que no riegue o ventile o de luz En caso
+	 * de que el usuario no haya asignado una fotografía a la planta se le asigna el
+	 * del tipo de planta correspondiente
+	 * La planta actual no puede tener fecha final
+	 * En caso de que haya una planta actual se da de baja y se pone la nueva
+	 * 
+	 * @param p planta que se quiere dar de alta
+	 * @param id_user id del usuario al que se quiere asignar la panta
+	 * @return la planta que se ha dado de alta en la base de datos
+	 */
 	public Planta guardar(Planta p, int id_user) {
-		finalizarPlantaActual(id_user);
-
 		if (plantasPorDefecto == null) {
 			System.out.println("inicializado");
 			inicializarListaPlantasPorDefecto();
@@ -147,7 +165,7 @@ public class GestorPlanta {
 		// cuando se da de alta una planta no puede haber fecha final
 		p.setFechaFin(null);
 
-		if (p.getImg() != null && p.getImg().equals("")) {
+		if (p.getImg() == null || (p.getImg() != null && p.getImg().equals(""))) {
 			Tiposplanta t = daoTiposplanta.findById(p.getTiposplanta().getId_tipoplanta());
 			p.setImg(t.getImg_url());
 		}
@@ -155,32 +173,50 @@ public class GestorPlanta {
 		p.setUsuario(daoUsuario.findById(id_user));
 
 		daoPlanta.save(p);
-
+		finalizarPlantaActual(id_user);
 		return p;
 	}
 
+	/**
+	 * Actualizar los datos de la planta
+	 * @param p planta con los nuevos datos
+	 * @param id_user id del usuario al que pertenece la planta
+	 */
 	public void actualizar(Planta p, int id_user) {
 		p.setUsuario(daoUsuario.getById(id_user));
-
 		daoPlanta.save(p);
 	}
 
+	/**
+	 * Finalizar la planta actual, es decir, poner fecha final a la planta actual. 
+	 * @param id_user id del usuairo
+	 * @return la planta actualizada o null si el usuario no tiene planta actual
+	 */
 	public Planta finalizarPlantaActual(int id_user) {
 		String[] partes;
 		Planta p = buscarPlantaActual(id_user);
 		if (p != null) {
 			partes = LocalDate.now().toString().split("-");
 			p.setFechaFin(partes[2] + "/" + partes[1] + "/" + partes[0]);
-
 			return daoPlanta.save(p);
 		}
 		return null;
 	}
 
+	/**
+	 * Eliminar todas las plantas del usuario
+	 * @param id id del usuario
+	 * @return 0 si no se ha encontrado 1 en caso contrario
+	 */
 	public int deleteByIdUser(int id) {
 		return daoPlanta.deleteByIdUser(id);
 	}
 
+	/**
+	 * Eliminar planta por id
+	 * @param id id de la planta
+	 * @return planta que ha sido eliminada o null
+	 */
 	public Planta deleteById(int id) {
 		daoPlanta.deleteById(id);
 		return daoPlanta.findById(id);

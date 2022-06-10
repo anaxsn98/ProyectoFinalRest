@@ -15,36 +15,32 @@ import es.uem.usuario.modelo.Usuario;
 @Repository
 public interface DaoUsuario extends JpaRepository<Usuario, Integer> {
 
-	// devolveria la primera coincidencia
+	/**
+	 * Búsqueda de usuario por correo
+	 * @param correo correo del usuario
+	 * @return usuario si se ha encontrado o nunll en caso contrario
+	 */
 	public Usuario findByCorreo(String correo);
 
+	/**
+	 * Búsqueda de usuario por nombre
+	 * @param nombre nombre del usuario
+	 * @return usuario si se ha encontrado o nunll en caso contrario
+	 */
 	public Usuario findByNombre(String nombre);
 
+	/**
+	 * Búsqueda de usuario por id
+	 * @param id id del usuario
+	 * @return usuario si se ha encontrado o nunll en caso contrario
+	 */
 	public Usuario findById(int id);
 
-	public Usuario findByNombreAndPwd(String nombre,String pwd);
-	
-	public Usuario findByCorreoAndPwd(String correo,String pwd);
 	/**
-	 * Cambiar la contraseña del usuario
-	 * @param pwd nueva contraseña que quiere usar el usuario
+	 * Eliminar usuario por id
 	 * @param id id del usuario
+	 * @return usuario si se ha encontrado o nunll en caso contrario
 	 */
-	@Transactional
-	@Modifying(clearAutomatically = true)
-	@Query(value = "UPDATE usuario u SET u.contrasena = :pwd_user  WHERE u.id_usuario = :id_user", nativeQuery = true)
-	public void updatePwd(@Param("pwd_user") String pwd, @Param("id_user") int id);
-
-	/**
-	 * Busqueda del id del usuario 
-	 * @param correo correo del usaurio
-	 * @return id numero que es el id del usuario, 0 si no existe
-	 */
-	@Transactional
-	@Modifying(clearAutomatically = true)
-	@Query(value = "SELECT id_usuario FROM usuario WHERE correo = :correo", nativeQuery = true)
-	public int findIdByCorreo(@Param("correo") String correo);
-
 	public Usuario deleteById(int id);
 
 }

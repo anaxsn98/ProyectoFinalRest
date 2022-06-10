@@ -24,60 +24,52 @@ import org.springframework.beans.factory.annotation.Qualifier;
 //va a permitir trabajar sobre un determinado controlador (añadiendo una anotacion) 
 //para indicar quien puede acceder si es necesario estar autenticado o tener algun rol
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter{
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private UserDetailsService userDetailsService;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
-	private  JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	@Autowired
 	private JwtAuthorizationFilter jwtAuthorizationFilter;
-	
+
 	/**
-	 * Va a exponer nuestro mecanismos de autenticación como un bean para poder usarlo en el filtro
+	 * Va a exponer nuestro mecanismos de autenticación como un bean para poder
+	 * usarlo en el filtro
 	 */
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
-	
 
+	/**
+	 * Configura el servicio para codificar contraseñas
+	 */
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
 	}
-	
+
 	/**
 	 * Configurar el control de acceso
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		
-		http
-			.csrf()
-				.disable()
-			.exceptionHandling()
-				.authenticationEntryPoint(jwtAuthenticationEntryPoint) // Lo modificamos más adelante
-			.and()
-			.sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)//sin estado para no utilizar sesiones
-			.and()
-			.authorizeRequests()//autorizar peticiones/si hubiera algun rol habria que identificar roles de acceso .hasRole("USER")
-			.antMatchers(HttpMethod.GET, "/**").permitAll()
-			.antMatchers(HttpMethod.POST, "/**").permitAll()
-			.antMatchers(HttpMethod.PUT, "/**").permitAll()
-			.antMatchers(HttpMethod.DELETE, "/**").permitAll()
+
+		http.csrf().disable().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint) 
+				.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)// sin estado para no
+																									// utilizar sesiones
+				.and().authorizeRequests()// autorizar peticiones/si hubiera algun rol habria que identificar roles de
+											// acceso .hasRole("USER")
+				.antMatchers(HttpMethod.GET, "/**").permitAll().antMatchers(HttpMethod.POST, "/**").permitAll()
+				.antMatchers(HttpMethod.PUT, "/**").permitAll().antMatchers(HttpMethod.DELETE, "/**").permitAll()
 				.anyRequest().authenticated();
 
 		// Filtro de autenticación
 		http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
-		
-		
-	}
-	
-	
 
+	}
 
 }

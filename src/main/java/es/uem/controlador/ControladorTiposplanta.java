@@ -26,11 +26,14 @@ import es.uem.usuario.modelo.Usuario;
 public class ControladorTiposplanta {
 	@Autowired
 	private DaoTiposplanta daoTiposplanta;
+	
+	/* PARA ACCEDER A TODOS LOS SERVICIOS DE ESTA CLASE SE REQUIERE QUE SE LES PASE UN TOKEN DE AUTENTIFICACIÓN*/
 
 	/**
-	 * Lista de todos los tipos de plantas
+	 * Lista de todos los tipos de plantas que hay en la base de datos
 	 * 
-	 * @return lista de tipos de plantas
+	 * @return lista de tipos de plantas y codigo de respuesta 200 ok o un 404 not
+	 *         found si no se ha encontrado ningún tipoplanta
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/tipoplanta", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -45,6 +48,13 @@ public class ControladorTiposplanta {
 			return new ResponseEntity<List<Tiposplanta>>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
 		}
 	}
+	
+	/**
+	 * Búsqueda de tiposplanta por id
+	 * @param id id de tipo planta 
+	 * @return si se ha encontrado devuelve un tiposplanta y codigo de respuesta 200 ok o un 404 not
+	 *         found si no se ha encontrado ningún tipoplanta con ese id
+	 */
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/tipoplanta/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Tiposplanta> getTipoPlantaById(@PathVariable("id") int id) {
@@ -54,37 +64,6 @@ public class ControladorTiposplanta {
 
 		if (t != null) {
 			return new ResponseEntity<Tiposplanta>(t, HttpStatus.OK);// 200 OK
-		} else {
-			return new ResponseEntity<Tiposplanta>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
-		}
-	}
-	@PreAuthorize("isAuthenticated()")
-	@GetMapping(path = "/tipoplanta/{nombre}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Tiposplanta> getTipoPlantaByNombre(@PathVariable("nombre") String nombre) {
-
-		// Búsqueda por nombre
-		Tiposplanta t = daoTiposplanta.findByNombre(nombre);
-
-		if (t != null) {
-			return new ResponseEntity<Tiposplanta>(t, HttpStatus.OK);// 200 OK
-		} else {
-			return new ResponseEntity<Tiposplanta>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
-		}
-	}
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping(path = "tipoplanta", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Tiposplanta> altaTipoPlanta(@RequestBody Tiposplanta p) {
-		daoTiposplanta.save(p);
-		return new ResponseEntity<Tiposplanta>(p, HttpStatus.CREATED);// 201 CREATED
-	}
-	@PreAuthorize("isAuthenticated()")
-	@DeleteMapping(path = "tipoplanta/{nombre}")
-	public ResponseEntity<Tiposplanta> borrarTipoPlanta(@PathVariable("nombre") String nombre) {
-
-		daoTiposplanta.deleteByNombre(nombre);
-		Tiposplanta p = daoTiposplanta.findByNombre(nombre);
-		if (p == null) {
-			return new ResponseEntity<Tiposplanta>(HttpStatus.OK);// 200 OK
 		} else {
 			return new ResponseEntity<Tiposplanta>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
 		}

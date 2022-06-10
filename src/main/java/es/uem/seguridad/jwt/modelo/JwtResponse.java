@@ -2,6 +2,10 @@ package es.uem.seguridad.jwt.modelo;
 
 import java.io.Serializable;
 
+/**
+ * Clase usada para la respuesta a la peticion al servicio de login 
+ *
+ */
 public class JwtResponse implements Serializable {
 
 	private static final long serialVersionUID = -8091879091924046844L;

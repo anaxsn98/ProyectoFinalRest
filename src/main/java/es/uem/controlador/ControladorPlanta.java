@@ -28,12 +28,16 @@ import es.uem.modelo.negocio.GestorPlanta;
 public class ControladorPlanta {
 	@Autowired
 	private GestorPlanta gestorPlanta;
+	
+	/* PARA ACCEDER A TODOS LOS SERVICIOS DE ESTA CLASE SE REQUIERE QUE SE LES PASE UN TOKEN DE AUTENTIFICACIÓN*/
 
 	/**
-	 * Devuelve los eventos de la planta
+	 * Devuelva una lista de eventos de la planta actual. En caso de que el usuario
+	 * no tenga una planta actual devolverá 404 not found
 	 * 
-	 * @param nombre nombre de la planta que se quiere buscar en la bbdd
-	 * @return el codigo 200 "OK" si existe o 404 NOT FOUND si no existe
+	 * @param id_usuario id de usuario
+	 * @return Una lista de eventos y el codigo de respuesta 200 ok o un 404 not
+	 *         found si el usuario no tiene ninguna planta actual
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "usuarios/{id}/plantas/eventos", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -46,12 +50,14 @@ public class ControladorPlanta {
 			return new ResponseEntity<List<Evento>>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
 		}
 	}
-	
+
 	/**
-	 * Devuelve los numeros que van a determinar la progressbar
+	 * Devuelve una lista de porcentajes de luz, riego y ventilación respectivamente
+	 * en caso de que el usuario tenga una planta actual
 	 * 
-	 * @param nombre nombre de la planta que se quiere buscar en la bbdd
-	 * @return el codigo 200 "OK" si existe o 404 NOT FOUND si no existe
+	 * @param id_usuario id de usuario
+	 * @return Una lista de porcentajes y el codigo de respuesta 200 ok o un 404 not
+	 *         found si el usuario no tiene ninguna planta actual
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "usuarios/{id}/plantas/progress", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -65,11 +71,11 @@ public class ControladorPlanta {
 	}
 
 	/**
-	 * Buscar planta por id de usuario que sea la actual es decir que la fecha final
-	 * no exista
+	 * Busca la planta que está actualmente en el invernadero del usuario
 	 * 
-	 * @param id del usuario
-	 * @return planta actual del usuario
+	 * @param id id del usuario
+	 * @return Devuelve la planta actual y el codigo de respuesta 200 ok o un 404
+	 *         not found si el usuario no tiene ninguna planta actual
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "usuarios/{id}/plantas", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -85,10 +91,11 @@ public class ControladorPlanta {
 	}
 
 	/**
-	 * Buscar todas las plantas de un usuario por el id de usuario
+	 * Búsqueda de todas las plantas que ha tenido y tiene el usuario
 	 * 
 	 * @param id id del usuario
-	 * @return lista de las plantas del usuario
+	 * @return Devuelve una lista de planta y el codigo de respuesta 200 ok o un 404
+	 *         not found si el usuario no tiene ninguna planta
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "usuarios/{id}/plantas/all", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -106,8 +113,9 @@ public class ControladorPlanta {
 	/**
 	 * Dar de alta una planta en la base de datos
 	 * 
-	 * @param u planta que queremos dar de alta
-	 * @return codigo de respuesta 201 CREATED
+	 * @param id_user id de usuario
+	 * @param p       planta que se quiere dar de alta
+	 * @return el codigo de respuesta 201 created
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping(path = "usuarios/{id}/plantas", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -121,10 +129,9 @@ public class ControladorPlanta {
 	/**
 	 * Modificar los datos de la planta
 	 * 
-	 * @param id id de la planta que quiere modificar
+	 * @param id id del usuairo
 	 * @param p  planta
-	 * @return el codigo de respuesta 200 "OK" si existe o 404 NOT FOUND si no
-	 *         existe
+	 * @return el codigo de respuesta 200 "OK"
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@PutMapping(path = "usuarios/{id}/plantas", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -136,23 +143,31 @@ public class ControladorPlanta {
 
 	}
 
+	/**
+	 * Comprueba si el usuairo tiene una planta actual y en caso de tenerla la da de
+	 * baja del invernadero es decir pone su fecha fin con la fecha actual
+	 * 
+	 * @param id_user id del usuario
+	 * @return Devuelve la planta modificada y el codigo de respuesta 200 ok o un
+	 *         404 not found si el usuario no tiene ninguna planta actual
+	 */
 	@PreAuthorize("isAuthenticated()")
 	@PutMapping(path = "usuarios/{id}/plantas/finalizar", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Planta> terminarPlantaActual(@PathVariable("id") int id_user) {
 		Planta p = gestorPlanta.finalizarPlantaActual(id_user);
-		if(p != null) {
+		if (p != null) {
 			return new ResponseEntity<Planta>(p, HttpStatus.OK);// 200 OK
-		}else {
-			return new ResponseEntity<Planta>(HttpStatus.NOT_FOUND);// 404 NOT FOUND	
+		} else {
+			return new ResponseEntity<Planta>(HttpStatus.NOT_FOUND);// 404 NOT FOUND
 		}
 	}
 
 	/**
-	 * Eliminar de la base de datos una planta por id
+	 * Eliminar una planta de la base de datos
 	 * 
-	 * @param id de la planta que se quiere eliminar
-	 * @return el codigo de respuesta 200 "OK" si existe o 404 NOT FOUND si no
-	 *         existe
+	 * @param id id de la planta que se quiere eliminar
+	 * @return Devuelve el codigo de respuesta 200 ok si se ha eliminado o un
+	 *         404 not found si no se ha encontrado una planta con ese id
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@DeleteMapping(path = "plantas/{id}")

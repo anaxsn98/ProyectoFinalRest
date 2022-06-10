@@ -26,6 +26,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	@Autowired
 	private GestorUsuario gestorUsuario;
 
+	/**
+	 * Filtro para comprobar la autenticación del usuario
+	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
@@ -53,17 +56,17 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 			UserDetails userDetails = this.gestorUsuario.loadUserByUsername(username);
 
-			// if token is valid configure Spring Security to manually set
-			// authentication
+			// si el token es válido, configure Spring Security para configurarlo manualmente
+			// autenticación
 			if (tokenProvider.validateToken(jwtToken,userDetails)) {
 
 				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
 				usernamePasswordAuthenticationToken
 						.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				// After setting the Authentication in the context, we specify
-				// that the current user is authenticated. So it passes the
-				// Spring Security Configurations successfully.
+				// Después de configurar la Autenticación en el contexto, especificamos
+				// que el usuario actual está autenticado. Así pasa el
+				// Configuraciones de Spring Security con éxito.
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 			}
 		}

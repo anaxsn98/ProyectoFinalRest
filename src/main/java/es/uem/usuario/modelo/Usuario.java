@@ -48,6 +48,7 @@ public class Usuario implements UserDetails {
 	private String nombre;
 	@Column(name = "contrasena")
 	private String pwd;
+	@Column(unique = true)
 	private String codigo_invernadero;
 	@JsonIgnore
 	@OneToMany(mappedBy = "usuario", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -122,30 +123,31 @@ public class Usuario implements UserDetails {
 	}
 
 	/**
-	 * Añadir una planta a la lista del usuario
+	 * Método que comprueba los cambios que se quieren hacer a los datos del usuario
+	 * y si son correctos los modifica
+	 * Comprueba que los datos no sean los mismos ni que estén vacíos
 	 * 
-	 * @param p planta que se quiere añadir a la lista de plantas
+	 * @param altaUser contiene los nuevos datos del usuario
 	 */
-	public void addPlanta(Planta p) {
-		this.plantas.add(p);
-	}
-
 	public void cambiosUsuairo(AltaUsuarioDto altaUser) {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-		if (!this.getNombre().equals(altaUser.getNombre()) && !altaUser.getNombre().equals("")) // si los nombres no coinciden
+		if (!this.getNombre().equals(altaUser.getNombre()) && !altaUser.getNombre().equals("")) // si los nombres no
+																								// coinciden
 			this.setNombre(altaUser.getNombre());
 
-		if (!this.getCorreo().equals(altaUser.getCorreo()) && !altaUser.getCorreo().equals("")) // si los Correos no coinciden
+		if (!this.getCorreo().equals(altaUser.getCorreo()) && !altaUser.getCorreo().equals("")) // si los Correos no
+																								// coinciden
 			this.setCorreo(altaUser.getCorreo());
 
 		// password
-		if(!altaUser.getPwd().equals("")) {
+		if (!altaUser.getPwd().equals("")) {
 			String pwdEncode = passwordEncoder.encode(altaUser.getPwd());
 			if (!this.getPwd().equals(pwdEncode)) // si los pwd no coinciden
 				this.setPwd(pwdEncode);
 		}
-		if (!this.getCodigo_invernadero().equals(altaUser.getCodigo_invernadero()) && !altaUser.getCodigo_invernadero().equals("")) // si los codigos no coinciden
+		if (!this.getCodigo_invernadero().equals(altaUser.getCodigo_invernadero())
+				&& !altaUser.getCodigo_invernadero().equals("")) // si los codigos no coinciden
 			this.setCodigo_invernadero(altaUser.getCodigo_invernadero());
 
 	}

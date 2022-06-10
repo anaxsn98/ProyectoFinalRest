@@ -1,4 +1,5 @@
 package es.uem.seguridad;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -18,17 +19,19 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
-	
 
+	/**
+	 * En caso de que el usuario no esté autorizado devuelva una respuesta de error
+	 */
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
-		
+
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());
 		response.setContentType("application/json");
-		
+
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-		
+
 	}
 
 }

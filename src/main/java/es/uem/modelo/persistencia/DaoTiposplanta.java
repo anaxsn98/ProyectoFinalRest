@@ -16,16 +16,18 @@ import es.uem.usuario.modelo.Usuario;
 @Repository
 public interface DaoTiposplanta extends JpaRepository<Tiposplanta, Integer> {
 	/**
-	 * Busca en la base de datos el tipo de planta con el id que se le pase por parámetro
+	 * Busca en la base de datos el tipo de planta con el id que se le pase por
+	 * parámetro
+	 * 
 	 * @param id id del tipo de planta que se está buscando
-	 * @return null si no se ha encontrado o el tipo de planta 
+	 * @return null si no se ha encontrado o el tipo de planta
 	 */
-	@Query(value = "SELECT * FROM tiposplanta	 WHERE id_tipoplanta= :id", nativeQuery = true)
+	@Query(value = "SELECT * FROM tiposplanta WHERE id_tipoplanta= :id", nativeQuery = true)
 	public Tiposplanta findById(@Param("id") int id);
-	
-	
-	public Tiposplanta findByNombre(String nombre);
+
+	/**
+	 * Búsqueda de todos los tipos de plantas que se encuentran en la base de datos
+	 */
 	public List<Tiposplanta> findAll();
-	
-	public int deleteByNombre(String nombre);
+
 }
