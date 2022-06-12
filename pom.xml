@@ -13,7 +13,7 @@
 	<artifactId>AppTFG_3</artifactId>
 	<version>v1.0.0</version>
 	<name>AppTFG_3</name>
-	<description>parte de app TFG para servicio rest </description>
+	<description>Modulo TFG para servicio rest </description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>

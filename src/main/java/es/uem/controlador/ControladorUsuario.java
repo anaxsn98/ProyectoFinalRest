@@ -28,7 +28,7 @@ public class ControladorUsuario {
 	 */
 
 	/**
-	 * Buar una persona por id
+	 * Busca una persona por id
 	 * 
 	 * @param id de la persona
 	 * @return Devuelve el usuario y el codigo de respuesta 200 ok o un 404 not

@@ -28,7 +28,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
 @RestController
 public class AuthenticationController {
 	@Autowired
@@ -42,7 +41,15 @@ public class AuthenticationController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	@PostMapping(path ="/authenticate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	/**
+	 * Método que comprueba si el usuairo existe y en caso de que exista en la base
+	 * de datos genera un token de autorización
+	 * 
+	 * @param authenticationRequest datos para hacer login del usuario
+	 * @return tipo JwtResponse con token id y nombre de usuario o null en caso de
+	 *         que el usuario sea incorrecto
+	 */
+	@PostMapping(path = "/authenticate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public JwtResponse login(@RequestBody JwtRequest authenticationRequest) {
 
 		try {
@@ -52,27 +59,31 @@ public class AuthenticationController {
 			e.printStackTrace();
 		}
 
-		final UserDetails userDetails = gestorUsuario
-				.loadUserByUsername(authenticationRequest.getUsername());
-		
-		Usuario user = gestorUsuario
-				.findUsuarioByNombre(authenticationRequest.getUsername());
-		
-		if(user == null)
-			user = gestorUsuario
-			.findUsuarioByCorreo(authenticationRequest.getUsername());
-	
+		final UserDetails userDetails = gestorUsuario.loadUserByUsername(authenticationRequest.getUsername());
+
+		Usuario user = gestorUsuario.findUsuarioByNombre(authenticationRequest.getUsername());
+
+		if (user == null)
+			user = gestorUsuario.findUsuarioByCorreo(authenticationRequest.getUsername());
+
 		if (user == null)
 			return null;
-					
-		if(!passwordEncoder.matches(authenticationRequest.getPassword(),user.getPwd())) {
+
+		if (!passwordEncoder.matches(authenticationRequest.getPassword(), user.getPwd())) {
 			return null;
 		}
 
-		final String token = tokenProvider.generateToken(userDetails,user.getId());
+		final String token = tokenProvider.generateToken(userDetails, user.getId());
 
-		return new JwtResponse(token,Integer.toString(user.getId()),user.getNombre());
+		return new JwtResponse(token, Integer.toString(user.getId()), user.getNombre());
 	}
+
+	/**
+	 * Método que autentifica a una persona
+	 * @param username nombre de usuario
+	 * @param password contraseña de usuario
+	 * @throws Exception
+	 */
 	private void authenticate(String username, String password) throws Exception {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -83,9 +94,15 @@ public class AuthenticationController {
 		}
 	}
 
+	/**
+	 * Da de alta un usuario en la base de datos, si se ha realizado correctamente se genera un token
+	 * @param u objeto AltaUsuarioDto con datos de alta del usuario
+	 * @return tipo JwtResponse con token id y nombre de usuario o null en caso de
+	 *         que el usuario sea incorrecto
+	 */
 	@PostMapping(path = "usuarios", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public JwtResponse altaPersona(@RequestBody AltaUsuarioDto u) {
-		if(gestorUsuario.altaUsuairo(u)) {
+		if (gestorUsuario.altaUsuairo(u)) {
 			System.out.println("dado de alta");
 			try {
 				authenticate(u.getNombre(), u.getPwd());
@@ -94,14 +111,12 @@ public class AuthenticationController {
 				e.printStackTrace();
 			}
 
-			final UserDetails userDetails = gestorUsuario
-					.loadUserByUsername(u.getNombre());
-			Usuario user = gestorUsuario
-					.findUsuarioByNombre(u.getNombre());
+			final UserDetails userDetails = gestorUsuario.loadUserByUsername(u.getNombre());
+			Usuario user = gestorUsuario.findUsuarioByNombre(u.getNombre());
 
-			final String token = tokenProvider.generateToken(userDetails,user.getId());
+			final String token = tokenProvider.generateToken(userDetails, user.getId());
 
-			return new JwtResponse(token,Integer.toString(user.getId()),user.getNombre());
+			return new JwtResponse(token, Integer.toString(user.getId()), user.getNombre());
 		}
 		System.out.println("no dado de alta");
 		return null;

@@ -136,6 +136,8 @@ public class GestorPlanta {
 	 * @return la planta que se ha dado de alta en la base de datos
 	 */
 	public Planta guardar(Planta p, int id_user) {
+		finalizarPlantaActual(id_user);
+		
 		if (plantasPorDefecto == null) {
 			System.out.println("inicializado");
 			inicializarListaPlantasPorDefecto();
@@ -173,7 +175,6 @@ public class GestorPlanta {
 		p.setUsuario(daoUsuario.findById(id_user));
 
 		daoPlanta.save(p);
-		finalizarPlantaActual(id_user);
 		return p;
 	}
 
